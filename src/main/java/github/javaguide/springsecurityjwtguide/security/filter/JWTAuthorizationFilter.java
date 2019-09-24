@@ -1,7 +1,9 @@
 package github.javaguide.springsecurityjwtguide.security.filter;
 
+import com.sun.org.apache.xml.internal.security.signature.InvalidSignatureValueException;
 import github.javaguide.springsecurityjwtguide.security.constants.SecurityConstants;
 import github.javaguide.springsecurityjwtguide.security.utils.JwtTokenUtils;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,7 +26,7 @@ import java.util.logging.Logger;
  */
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
-    private static final Logger LOGGER = Logger.getLogger(JWTAuthorizationFilter.class.getName());
+    private static final Logger logger = Logger.getLogger(JWTAuthorizationFilter.class.getName());
 
     public JWTAuthorizationFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
@@ -51,11 +53,16 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
      */
     private UsernamePasswordAuthenticationToken getAuthentication(String authorization) {
         String token = authorization.replace(SecurityConstants.TOKEN_PREFIX, "");
-        String username = JwtTokenUtils.getUsernameByToken(token);
-        // 通过 token 获取用户具有的角色
-        List<SimpleGrantedAuthority> userRolesByToken = JwtTokenUtils.getUserRolesByToken(token);
-        if (!StringUtils.isEmpty(username)) {
-            return new UsernamePasswordAuthenticationToken(username, null, userRolesByToken);
+
+        try {
+            String username = JwtTokenUtils.getUsernameByToken(token);
+            // 通过 token 获取用户具有的角色
+            List<SimpleGrantedAuthority> userRolesByToken = JwtTokenUtils.getUserRolesByToken(token);
+            if (!StringUtils.isEmpty(username)) {
+                return new UsernamePasswordAuthenticationToken(username, null, userRolesByToken);
+            }
+        } catch (SignatureException exception) {
+            logger.warning("Request to parse JWT with invalid signature . Detail : "+exception.getMessage());
         }
         return null;
     }

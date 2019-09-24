@@ -1,10 +1,15 @@
 package github.javaguide.springsecurityjwtguide.security.utils;
 
+import com.sun.org.apache.xml.internal.security.signature.InvalidSignatureValueException;
 import github.javaguide.springsecurityjwtguide.security.constants.SecurityConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.crypto.SecretKey;
@@ -33,7 +38,7 @@ public class JwtTokenUtils {
     private static final long EXPIRATION_REMEMBER = 604800L;
 
     /**
-     *    生成足够的安全随机密钥，以适合符合规范的签名
+     * 生成足够的安全随机密钥，以适合符合规范的签名
      */
     private static byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(SecurityConstants.JWT_SECRET_KEY);
     private static SecretKey secretKey = Keys.hmacShaKeyFor(apiKeySecretBytes);
@@ -42,6 +47,7 @@ public class JwtTokenUtils {
         long expiration = isRememberMe ? EXPIRATION_REMEMBER : EXPIRATION;
 
         String tokenPrefix = Jwts.builder()
+                .setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .claim(ROLE_CLAIMS, String.join(",", roles))
                 .setIssuer("SnailClimb")
@@ -75,9 +81,10 @@ public class JwtTokenUtils {
     }
 
     private static Claims getTokenBody(String token) {
-        return Jwts.parser()
+        Claims claims = Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
+        return claims;
     }
 }
