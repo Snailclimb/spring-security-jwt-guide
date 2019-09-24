@@ -2,9 +2,7 @@ package github.javaguide.springsecurityjwtguide.security.service;
 
 import github.javaguide.springsecurityjwtguide.security.entity.JwtUser;
 import github.javaguide.springsecurityjwtguide.system.entity.User;
-import github.javaguide.springsecurityjwtguide.system.repository.UserRepository;
 import github.javaguide.springsecurityjwtguide.system.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
