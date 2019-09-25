@@ -1,5 +1,7 @@
 # spring-security-jwt-guide
 
+**如果国内访问缓慢的话，可以通过码云查看：** https://gitee.com/SnailClimb/spring-security-jwt-guide。
+
 ## Setup
 
 1. git clone https://github.com/Snailclimb/spring-security-jwt-guide.git
