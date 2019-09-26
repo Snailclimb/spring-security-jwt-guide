@@ -5,8 +5,8 @@
 ## Setup
 
 1. git clone https://github.com/Snailclimb/spring-security-jwt-guide.git
-2. open project and wait maven to install project Dependencies
-3. change `application.properties` change the database connection information parameter to your own
+2. 打开项目并且等待Maven下载好相关依赖
+3. 修改 `application.properties` 将数据库连接信息改成你自己的
 
 ## Example
 
@@ -28,7 +28,7 @@
 
 ### 5.Access resources that require authentication  with not correct token
 
-![](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/2019-7/5-visit-authenticated-resourse-not-have-valid-token.png)
+![Access resources that require authentication  with not correct token](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/2019-7/5-visit-authenticated-resourse-not-have-valid-token.png)
 
 
 
