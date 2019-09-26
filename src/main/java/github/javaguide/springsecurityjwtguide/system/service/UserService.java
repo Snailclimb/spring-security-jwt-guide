@@ -30,7 +30,7 @@ public class UserService {
     public void saveUser(Map<String, String> registerUser) {
         Optional<User> optionalUser = userRepository.findByUsername(registerUser.get("username"));
         if (optionalUser.isPresent()) {
-            throw new UserNameAlreadyExistException("账户名已经存在");
+            throw new UserNameAlreadyExistException("User name already exist!Please choose another user name.");
         }
         User user = new User();
         user.setUsername(registerUser.get("username"));
