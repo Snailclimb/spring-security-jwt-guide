@@ -5,7 +5,7 @@
 ## Setup
 
 1. git clone https://github.com/Snailclimb/spring-security-jwt-guide.git
-2. open project and wait maven to install project Dependencies
+2. open project and wait maven to install project Dependencies。It is recommended that you open with IDEA, and make sure that you download the lombok plug-in for your idea
 3. change `application.properties` change the database connection information parameter to your own
 
 ## Example
