@@ -1,6 +1,6 @@
 # spring-security-jwt-guide
 
-ENGLISH
+[English version](https://github.com/Snailclimb/spring-security-jwt-guide/blob/master/README-ENGLISH.md)
 
 **如果国内访问缓慢的话，可以通过码云查看：** https://gitee.com/SnailClimb/spring-security-jwt-guide 。
 
