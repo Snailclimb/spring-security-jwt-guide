@@ -5,9 +5,9 @@
 ## Setup
 
 1. git clone https://github.com/Snailclimb/spring-security-jwt-guide.git
-2. 打开项目并且等待Maven下载好相关依赖
-3. 修改 `application.properties` 将数据库连接信息改成你自己的
-
+2. 打开项目并且等待Maven下载好相关依赖。建议使用idea 打开，并确保你的idea 下载了 lombok插件。
+3. 修改 `application.properties` 将数据库连接信息改成你自己的。
+3. change `application.properties` change the database connection information parameter to your own
 ## Example
 
 ### 1.Register an account
