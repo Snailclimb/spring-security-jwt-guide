@@ -26,7 +26,7 @@ public class JwtTokenUtils {
     /**
      * rememberMe 为 false 的时候过期时间是1个小时
      */
-    private static final long EXPIRATION =  60L;
+    private static final long EXPIRATION = 60 * 60L;
     /**
      * rememberMe 为 true 的时候过期时间是7天
      */
