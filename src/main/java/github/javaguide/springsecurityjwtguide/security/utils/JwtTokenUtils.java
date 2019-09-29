@@ -29,13 +29,13 @@ public class JwtTokenUtils {
      **/
     private static final String ROLE_CLAIMS = "rol";
     /**
-     * 过期时间是3600秒，既是1个小时
+     * rememberMe 为 false 的时候过期时间是1个小时
      */
-    private static final long EXPIRATION = 60L;
+    private static final long EXPIRATION = 60 * 60L;
     /**
-     * 选择了记住我之后的过期时间为7天
+     * rememberMe 为 true 的时候过期时间是7天
      */
-    private static final long EXPIRATION_REMEMBER = 604800L;
+    private static final long EXPIRATION_REMEMBER = 60 * 60 * 24 * 7L;
 
     /**
      * 生成足够的安全随机密钥，以适合符合规范的签名
@@ -71,13 +71,6 @@ public class JwtTokenUtils {
         return Arrays.stream(role.split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
-    }
-
-    /**
-     * Token是否过期
-     */
-    public static boolean isExpiration(String token) {
-        return getTokenBody(token).getExpiration().before(new Date());
     }
 
     private static Claims getTokenBody(String token) {
