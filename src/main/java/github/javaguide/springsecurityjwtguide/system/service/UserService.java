@@ -47,7 +47,6 @@ public class UserService {
 
 
     public Page<User> getAllUser(int pageNum, int pageSize) {
-        Page<User> users = userRepository.findAll(PageRequest.of(pageNum, pageSize));
-        return users;
+        return userRepository.findAll(PageRequest.of(pageNum, pageSize));
     }
 }

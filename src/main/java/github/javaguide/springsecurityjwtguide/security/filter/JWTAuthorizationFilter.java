@@ -3,6 +3,7 @@ package github.javaguide.springsecurityjwtguide.security.filter;
 import com.sun.org.apache.xml.internal.security.signature.InvalidSignatureValueException;
 import github.javaguide.springsecurityjwtguide.security.constants.SecurityConstants;
 import github.javaguide.springsecurityjwtguide.security.utils.JwtTokenUtils;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -61,8 +62,8 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             if (!StringUtils.isEmpty(username)) {
                 return new UsernamePasswordAuthenticationToken(username, null, userRolesByToken);
             }
-        } catch (SignatureException exception) {
-            logger.warning("Request to parse JWT with invalid signature . Detail : "+exception.getMessage());
+        } catch (SignatureException | ExpiredJwtException exception) {
+            logger.warning("Request to parse JWT with invalid signature . Detail : " + exception.getMessage());
         }
         return null;
     }

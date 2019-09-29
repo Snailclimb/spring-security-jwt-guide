@@ -1,15 +1,10 @@
 package github.javaguide.springsecurityjwtguide.security.utils;
 
-import com.sun.org.apache.xml.internal.security.signature.InvalidSignatureValueException;
 import github.javaguide.springsecurityjwtguide.security.constants.SecurityConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.crypto.SecretKey;
@@ -31,7 +26,7 @@ public class JwtTokenUtils {
     /**
      * rememberMe 为 false 的时候过期时间是1个小时
      */
-    private static final long EXPIRATION = 60 * 60L;
+    private static final long EXPIRATION =  60L;
     /**
      * rememberMe 为 true 的时候过期时间是7天
      */
@@ -74,10 +69,9 @@ public class JwtTokenUtils {
     }
 
     private static Claims getTokenBody(String token) {
-        Claims claims = Jwts.parser()
+        return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
-        return claims;
     }
 }
