@@ -39,8 +39,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                                 HttpServletResponse response) throws AuthenticationException {
 
         ObjectMapper objectMapper = new ObjectMapper();
-        // 从输入流中获取到登录的信息
         try {
+            // 从输入流中获取到登录的信息
             LoginUser loginUser = objectMapper.readValue(request.getInputStream(), LoginUser.class);
             rememberMe.set(loginUser.getRememberMe());
             return authenticationManager.authenticate(
