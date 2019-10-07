@@ -4,8 +4,8 @@ import github.javaguide.springsecurityjwtguide.security.exception.JWTAccessDenie
 import github.javaguide.springsecurityjwtguide.security.exception.JWTAuthenticationEntryPoint;
 import github.javaguide.springsecurityjwtguide.security.filter.JWTAuthenticationFilter;
 import github.javaguide.springsecurityjwtguide.security.filter.JWTAuthorizationFilter;
+import github.javaguide.springsecurityjwtguide.security.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -26,10 +26,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    @Qualifier("userDetailsServiceImpl")
-    private UserDetailsService userDetailsService;
-
-
+    UserDetailsServiceImpl userDetailsServiceImpl;
 
     /**
      * 密码编码器
@@ -39,9 +36,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public UserDetailsService createUserDetailsService() {
+        return userDetailsServiceImpl;
+    }
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
+        // 设置自定义的userDetailsService以及密码编码器
+        auth.userDetailsService(userDetailsServiceImpl).passwordEncoder(bCryptPasswordEncoder());
     }
 
     @Override
@@ -64,7 +67,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 // 授权异常处理
                 .exceptionHandling().authenticationEntryPoint(new JWTAuthenticationEntryPoint())
-                .accessDeniedHandler(new JWTAccessDeniedHandler());;
+                .accessDeniedHandler(new JWTAccessDeniedHandler());
+
     }
 
 }

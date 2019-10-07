@@ -31,6 +31,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
+        // 设置URL，以确定是否需要身份验证
         super.setFilterProcessesUrl(SecurityConstants.AUTH_LOGIN_URL);
     }
 
@@ -43,9 +44,11 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             // 从输入流中获取到登录的信息
             LoginUser loginUser = objectMapper.readValue(request.getInputStream(), LoginUser.class);
             rememberMe.set(loginUser.getRememberMe());
-            return authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginUser.getUsername(),
-                            loginUser.getPassword(), new ArrayList<>()));
+            // 这部分和attemptAuthentication方法中的源码是一样的，
+            // 只不过由于这个方法源码的是把用户名和密码这些参数的名字是死的，所以我们重写了一下
+            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
+                    loginUser.getUsername(), loginUser.getPassword());
+            return authenticationManager.authenticate(authRequest);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -71,6 +74,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // Http Response Header 中返回 Token
         response.setHeader(SecurityConstants.TOKEN_HEADER, token);
     }
+
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException authenticationException) throws IOException {

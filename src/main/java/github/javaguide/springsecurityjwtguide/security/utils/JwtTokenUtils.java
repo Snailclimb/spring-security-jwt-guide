@@ -41,6 +41,11 @@ public class JwtTokenUtils {
         return SecurityConstants.TOKEN_PREFIX + tokenPrefix;
     }
 
+    private boolean isTokenExpired(String token) {
+        Date expiredDate = getTokenBody(token).getExpiration();
+        return expiredDate.before(new Date());
+    }
+
     public static String getUsernameByToken(String token) {
         return getTokenBody(token).getSubject();
     }
