@@ -34,6 +34,12 @@
 
 ### 2.登录
 
+登录的时候传的参数示例：
+
+```json
+{"username": "123456", "password": "123456","rememberMe":true}
+```
+
 ![Login](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/2019-7/2-login.png)
 
 ### 3.使用正确 Token 访问需要进行身份验证的资源
