@@ -68,7 +68,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // 授权异常处理
                 .exceptionHandling().authenticationEntryPoint(new JWTAuthenticationEntryPoint())
                 .accessDeniedHandler(new JWTAccessDeniedHandler());
-
+        // 防止H2 web 页面的Frame 被拦截
+        http.headers().frameOptions().disable();
     }
 
 }
