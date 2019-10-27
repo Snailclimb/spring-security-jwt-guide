@@ -7,7 +7,7 @@
 ## 相关文档
 
 - [JWT 优缺点分析以及常见问题解决方案](https://github.com/Snailclimb/JavaGuide/blob/master/docs/system-design/authority-certification/JWT-advantages-and-disadvantages.md)
-- [项目讲解](./docs/比较重要的类的讲解.md)
+- [项目讲解](./docs/项目讲解.md)
 
 ## 介绍
 

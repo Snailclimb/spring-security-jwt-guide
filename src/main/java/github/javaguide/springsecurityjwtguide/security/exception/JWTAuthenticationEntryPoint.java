@@ -13,7 +13,7 @@ import java.io.IOException;
  */
 public class JWTAuthenticationEntryPoint implements AuthenticationEntryPoint {
     /**
-     * 当用户尝试访问需要权限才能的REST资源而不提供Token或者Token过期时，
+     * 当用户尝试访问需要权限才能的REST资源而不提供Token或者Token错误或者过期时，
      * 将调用此方法发送401响应以及错误信息
      */
     @Override
