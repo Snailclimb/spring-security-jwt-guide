@@ -11,7 +11,7 @@ import java.io.IOException;
  * @author shuang.kou
  * AccessDeineHandler 用来解决认证过的用户访问无权限资源时的异常
  */
-public class JWTAccessDeniedHandler implements AccessDeniedHandler {
+public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     /**
      * 当用户尝试访问需要权限才能的REST资源而权限不足的时候，
      * 将调用此方法发送401响应以及错误信息

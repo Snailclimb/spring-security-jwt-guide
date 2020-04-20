@@ -1,14 +1,13 @@
 package github.javaguide.springsecurityjwtguide.system.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import github.javaguide.springsecurityjwtguide.system.enums.RoleType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -28,14 +27,14 @@ public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Enumerated(value = EnumType.STRING)
-    private RoleType name;
+    private String name;
     private String description;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<UserRole> userRoles = new ArrayList<>();
 
-    public Role(RoleType name, String description) {
+    public Role(String name, String description) {
         this.name = name;
         this.description = description;
     }

@@ -23,12 +23,12 @@ import java.util.stream.Collectors;
  * @author shuang.kou
  * 如果用户名和密码正确，那么过滤器将创建一个JWT Token 并在HTTP Response 的header中返回它，格式：token: "Bearer +具体token值"
  */
-public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private ThreadLocal<Boolean> rememberMe = new ThreadLocal<>();
     private AuthenticationManager authenticationManager;
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
         // 设置URL，以确定是否需要身份验证
         super.setFilterProcessesUrl(SecurityConstants.AUTH_LOGIN_URL);
@@ -40,14 +40,14 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            // 从输入流中获取到登录的信息
+            // 获取登录的信息
             LoginUser loginUser = objectMapper.readValue(request.getInputStream(), LoginUser.class);
             rememberMe.set(loginUser.getRememberMe());
             // 这部分和attemptAuthentication方法中的源码是一样的，
             // 只不过由于这个方法源码的是把用户名和密码这些参数的名字是死的，所以我们重写了一下
-            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     loginUser.getUsername(), loginUser.getPassword());
-            return authenticationManager.authenticate(authRequest);
+            return authenticationManager.authenticate(authentication);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -70,6 +70,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .collect(Collectors.toList());
         // 创建 Token
         String token = JwtTokenUtils.createToken(jwtUser.getUsername(), authorities, rememberMe.get());
+        rememberMe.remove();
         // Http Response Header 中返回 Token
         response.setHeader(SecurityConstants.TOKEN_HEADER, token);
     }

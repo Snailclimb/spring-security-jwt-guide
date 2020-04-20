@@ -1,21 +1,16 @@
 package github.javaguide.springsecurityjwtguide.security.filter;
 
 import github.javaguide.springsecurityjwtguide.security.constants.SecurityConstants;
-import github.javaguide.springsecurityjwtguide.security.service.UserDetailsServiceImpl;
 import github.javaguide.springsecurityjwtguide.security.utils.JwtTokenUtils;
-import github.javaguide.springsecurityjwtguide.system.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.FilterChain;
@@ -31,11 +26,12 @@ import java.util.logging.Logger;
  *
  * @author shuang.kou
  */
-public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
-    private static final Logger logger = Logger.getLogger(JWTAuthorizationFilter.class.getName());
+public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
-    public JWTAuthorizationFilter(AuthenticationManager authenticationManager) {
+    private static final Logger logger = Logger.getLogger(JwtAuthorizationFilter.class.getName());
+
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
     }
 
@@ -45,14 +41,12 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                                     FilterChain chain) throws IOException, ServletException {
 
         String authorization = request.getHeader(SecurityConstants.TOKEN_HEADER);
-        // 如果请求头中没有token信息则直接放行了
         if (authorization == null || !authorization.startsWith(SecurityConstants.TOKEN_PREFIX)) {
-            chain.doFilter(request, response);
-            return;
+            SecurityContextHolder.clearContext();
+        } else {
+            SecurityContextHolder.getContext().setAuthentication(getAuthentication(authorization));
         }
-        // 如果请求头中有token，则进行解析，并且设置授权信息
-        SecurityContextHolder.getContext().setAuthentication(getAuthentication(authorization));
-        super.doFilterInternal(request, response, chain);
+        chain.doFilter(request, response);
     }
 
     /**
@@ -64,6 +58,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             String username = JwtTokenUtils.getUsernameByToken(token);
             logger.info("checking username:" + username);
             // 通过 token 获取用户具有的角色
+            // TODO 实时从数据库中获取
             List<SimpleGrantedAuthority> userRolesByToken = JwtTokenUtils.getUserRolesByToken(token);
             if (!StringUtils.isEmpty(username)) {
                 return new UsernamePasswordAuthenticationToken(username, null, userRolesByToken);

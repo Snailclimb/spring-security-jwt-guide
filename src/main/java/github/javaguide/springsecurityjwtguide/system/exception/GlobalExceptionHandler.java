@@ -30,8 +30,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorReponse);
     }
 
-    @ExceptionHandler(value = UserNotFoundException.class)
-    public ResponseEntity<ErrorReponse> handleUserNotFoundException(UserNotFoundException ex, HttpServletRequest request) {
+    @ExceptionHandler(value = NotFoundException.class)
+    public ResponseEntity<ErrorReponse> handleUserNotFoundException(NotFoundException ex, HttpServletRequest request) {
         ErrorReponse errorReponse = new ErrorReponse(ex, request.getRequestURI());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorReponse);
     }

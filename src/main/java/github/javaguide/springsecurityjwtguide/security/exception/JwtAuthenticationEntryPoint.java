@@ -11,7 +11,7 @@ import java.io.IOException;
  * @author shuang.kou
  * AuthenticationEntryPoint 用来解决匿名用户访问需要权限才能访问的资源时的异常
  */
-public class JWTAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     /**
      * 当用户尝试访问需要权限才能的REST资源而不提供Token或者Token错误或者过期时，
      * 将调用此方法发送401响应以及错误信息

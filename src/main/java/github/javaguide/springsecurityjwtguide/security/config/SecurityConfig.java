@@ -1,9 +1,9 @@
 package github.javaguide.springsecurityjwtguide.security.config;
 
-import github.javaguide.springsecurityjwtguide.security.exception.JWTAccessDeniedHandler;
-import github.javaguide.springsecurityjwtguide.security.exception.JWTAuthenticationEntryPoint;
-import github.javaguide.springsecurityjwtguide.security.filter.JWTAuthenticationFilter;
-import github.javaguide.springsecurityjwtguide.security.filter.JWTAuthorizationFilter;
+import github.javaguide.springsecurityjwtguide.security.exception.JwtAccessDeniedHandler;
+import github.javaguide.springsecurityjwtguide.security.exception.JwtAuthenticationEntryPoint;
+import github.javaguide.springsecurityjwtguide.security.filter.JwtAuthenticationFilter;
+import github.javaguide.springsecurityjwtguide.security.filter.JwtAuthorizationFilter;
 import github.javaguide.springsecurityjwtguide.security.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -61,13 +61,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().permitAll()
                 .and()
                 //添加自定义Filter
-                .addFilter(new JWTAuthenticationFilter(authenticationManager()))
-                .addFilter(new JWTAuthorizationFilter(authenticationManager()))
+                .addFilter(new JwtAuthenticationFilter(authenticationManager()))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager()))
                 // 不需要session（不创建会话）
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 // 授权异常处理
-                .exceptionHandling().authenticationEntryPoint(new JWTAuthenticationEntryPoint())
-                .accessDeniedHandler(new JWTAccessDeniedHandler());
+                .exceptionHandling().authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                .accessDeniedHandler(new JwtAccessDeniedHandler());
         // 防止H2 web 页面的Frame 被拦截
         http.headers().frameOptions().disable();
     }
