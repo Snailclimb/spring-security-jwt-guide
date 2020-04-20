@@ -1,4 +1,4 @@
-package github.javaguide.springsecurityjwtguide.security.dto;
+package github.javaguide.springsecurityjwtguide.system.dto;
 
 
 import github.javaguide.springsecurityjwtguide.system.validator.FullName;
@@ -20,5 +20,6 @@ public class UserRegisterRequest {
     @NotBlank
     private String password;
     @FullName
+    @NotBlank
     private String fullName;
 }

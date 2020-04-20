@@ -1,6 +1,6 @@
 package github.javaguide.springsecurityjwtguide.security.controller;
 
-import github.javaguide.springsecurityjwtguide.security.dto.UserRegisterRequest;
+import github.javaguide.springsecurityjwtguide.system.dto.UserRegisterRequest;
 import github.javaguide.springsecurityjwtguide.system.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -1,11 +1,13 @@
 package github.javaguide.springsecurityjwtguide.system.service;
 
-import github.javaguide.springsecurityjwtguide.security.dto.UserRegisterRequest;
+import com.google.common.collect.ImmutableMap;
+import github.javaguide.springsecurityjwtguide.system.dto.UserRegisterRequest;
 import github.javaguide.springsecurityjwtguide.system.entity.Role;
 import github.javaguide.springsecurityjwtguide.system.entity.User;
 import github.javaguide.springsecurityjwtguide.system.entity.UserRole;
 import github.javaguide.springsecurityjwtguide.system.enums.RoleType;
 import github.javaguide.springsecurityjwtguide.system.exception.UserNameAlreadyExistException;
+import github.javaguide.springsecurityjwtguide.system.exception.UserNotFoundException;
 import github.javaguide.springsecurityjwtguide.system.repository.RoleRepository;
 import github.javaguide.springsecurityjwtguide.system.repository.UserRepository;
 import github.javaguide.springsecurityjwtguide.system.repository.UserRoleRepository;
@@ -13,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -56,13 +57,12 @@ public class UserService {
     private void checkUserNameNotExist(String userName) {
         Optional<User> optionalUser = userRepository.findByUsername(userName);
         if (optionalUser.isPresent()) {
-            throw new UserNameAlreadyExistException("User name already exist!Please choose another user name.");
+            throw new UserNameAlreadyExistException(ImmutableMap.of("username", userName));
         }
     }
 
     public User findUserByUserName(String name) {
-        return userRepository.findByUsername(name)
-                .orElseThrow(() -> new UsernameNotFoundException("No user found with username " + name));
+        return userRepository.findByUsername(name).orElseThrow(() -> new UserNotFoundException(ImmutableMap.of("username", name)));
     }
 
     public void deleteUserByUserName(String name) {

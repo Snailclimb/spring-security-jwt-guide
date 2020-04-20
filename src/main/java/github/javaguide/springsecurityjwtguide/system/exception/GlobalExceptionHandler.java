@@ -1,22 +1,44 @@
 package github.javaguide.springsecurityjwtguide.system.exception;
 
 import io.jsonwebtoken.security.SignatureException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+
 
 /**
  * @author shuang.kou
  */
 @ControllerAdvice
+@ResponseBody
 public class GlobalExceptionHandler {
-    @ExceptionHandler(value = UserNameAlreadyExistException.class)
-    public ResponseEntity<ErrorMessage> handleUserNameAlreadyExistException(UserNameAlreadyExistException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorMessage(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<?> handleAppException(BaseException ex, HttpServletRequest request) {
+        ErrorReponse representation = new ErrorReponse(ex, request.getRequestURI());
+        return new ResponseEntity<>(representation, new HttpHeaders(), ex.getErrorCode().getStatus());
     }
+
+    @ExceptionHandler(value = UserNameAlreadyExistException.class)
+    public ResponseEntity<ErrorReponse> handleUserNameAlreadyExistException(UserNameAlreadyExistException ex, HttpServletRequest request) {
+        ErrorReponse errorReponse = new ErrorReponse(ex, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorReponse);
+    }
+
+    @ExceptionHandler(value = UserNameAlreadyExistException.class)
+    public ResponseEntity<ErrorReponse> handleUserNotFoundException(UserNotFoundException ex, HttpServletRequest request) {
+        ErrorReponse errorReponse = new ErrorReponse(ex, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorReponse);
+    }
+
     @ExceptionHandler(value = SignatureException.class)
-    public ResponseEntity<ErrorMessage> handleSignatureException(SignatureException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorMessage(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
+    public ResponseEntity<ErrorReponse> handleSignatureException(SignatureException ex, HttpServletRequest request) {
+        ErrorReponse errorReponse = new ErrorReponse(ErrorCode.VERIFY_JWT_FAILED, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorReponse);
     }
 }
