@@ -20,13 +20,4 @@ public enum UserStatus {
         return this.status;
     }
 
-    @JsonCreator
-    public static UserStatus fromRole(String status) {
-        for (UserStatus type : UserStatus.values()) {
-            if (type.getName().equals(status)) {
-                return type;
-            }
-        }
-        return null;
-    }
 }

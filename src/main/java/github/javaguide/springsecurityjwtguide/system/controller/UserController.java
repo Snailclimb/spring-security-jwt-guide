@@ -29,7 +29,7 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    @PreAuthorize("hasAnyRole('ROLE_DEV','ROLE_PM','ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ROLE_ADMIN')")
     public ResponseEntity<Page<User>> getAllUser(@RequestParam(value = "pageNum", defaultValue = "0") int pageNum, @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
         System.out.println("当前访问该接口的用户为：" + currentUser.getCurrentUser().toString());
         Page<User> allUser = userService.getAllUser(pageNum, pageSize);

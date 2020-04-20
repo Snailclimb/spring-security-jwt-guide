@@ -64,12 +64,12 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             Authentication authentication) {
 
         JwtUser jwtUser = (JwtUser) authentication.getPrincipal();
-        List<String> roles = jwtUser.getAuthorities()
+        List<String> authorities = jwtUser.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
         // 创建 Token
-        String token = JwtTokenUtils.createToken(jwtUser.getUsername(), roles, rememberMe.get());
+        String token = JwtTokenUtils.createToken(jwtUser.getUsername(), authorities, rememberMe.get());
         // Http Response Header 中返回 Token
         response.setHeader(SecurityConstants.TOKEN_HEADER, token);
     }

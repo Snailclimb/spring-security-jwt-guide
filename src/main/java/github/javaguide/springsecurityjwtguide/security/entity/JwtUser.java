@@ -1,17 +1,19 @@
 package github.javaguide.springsecurityjwtguide.security.entity;
 
 import github.javaguide.springsecurityjwtguide.system.entity.User;
+import github.javaguide.springsecurityjwtguide.system.entity.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author shuang.kou
  */
 public class JwtUser implements UserDetails {
 
-    private Integer id;
+    private Long id;
     private String username;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;

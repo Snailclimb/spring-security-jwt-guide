@@ -1,9 +1,10 @@
 package github.javaguide.springsecurityjwtguide.system.entity;
 
+
+import github.javaguide.springsecurityjwtguide.system.enums.RoleType;
 import github.javaguide.springsecurityjwtguide.system.enums.UserStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -16,7 +17,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author shuang.kou
@@ -24,26 +24,20 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "user")
-public class User {
-
+@Table(name = "role")
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
-    private String password;
-
     @Enumerated(value = EnumType.STRING)
-    private UserStatus status;
+    private RoleType name;
+    private String description;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
     private List<UserRole> userRoles = new ArrayList<>();
 
-    public List<SimpleGrantedAuthority> getRoles() {
-        List<Role> roles = userRoles.stream().map(UserRole::getRole).collect(Collectors.toList());
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        roles.forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName().toString())));
-        return authorities;
+    public Role(RoleType name, String description) {
+        this.name = name;
+        this.description = description;
     }
-
 }
