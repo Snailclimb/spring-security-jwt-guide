@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorReponse);
     }
 
-    @ExceptionHandler(value = UserNameAlreadyExistException.class)
+    @ExceptionHandler(value = UserNotFoundException.class)
     public ResponseEntity<ErrorReponse> handleUserNotFoundException(UserNotFoundException ex, HttpServletRequest request) {
         ErrorReponse errorReponse = new ErrorReponse(ex, request.getRequestURI());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorReponse);
