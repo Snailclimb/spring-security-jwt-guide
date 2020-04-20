@@ -2,7 +2,6 @@ package github.javaguide.springsecurityjwtguide.system.entity;
 
 
 import github.javaguide.springsecurityjwtguide.system.enums.RoleType;
-import github.javaguide.springsecurityjwtguide.system.enums.UserStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

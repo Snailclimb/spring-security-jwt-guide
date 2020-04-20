@@ -1,14 +1,14 @@
 package github.javaguide.springsecurityjwtguide.system.entity;
 
-import github.javaguide.springsecurityjwtguide.system.enums.UserStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
  */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "user")
 public class User {
@@ -31,10 +33,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String username;
+    private String fullName;
     private String password;
-
-    @Enumerated(value = EnumType.STRING)
-    private UserStatus status;
+    @Column(columnDefinition="tinyint(1) default 1")
+    private Boolean enabled;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserRole> userRoles = new ArrayList<>();

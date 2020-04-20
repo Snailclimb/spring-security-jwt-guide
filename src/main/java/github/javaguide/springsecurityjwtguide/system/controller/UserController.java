@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author shuang.kou
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
@@ -28,7 +28,7 @@ public class UserController {
         this.currentUser = currentUser;
     }
 
-    @GetMapping("/users")
+    @GetMapping
     @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ROLE_ADMIN')")
     public ResponseEntity<Page<User>> getAllUser(@RequestParam(value = "pageNum", defaultValue = "0") int pageNum, @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
         System.out.println("当前访问该接口的用户为：" + currentUser.getCurrentUser().toString());
@@ -36,8 +36,7 @@ public class UserController {
         return ResponseEntity.ok().body(allUser);
     }
 
-
-    @DeleteMapping("/user")
+    @DeleteMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public ResponseEntity<User> deleteUserById(@RequestParam("username") String username) {
         userService.deleteUserByUserName(username);

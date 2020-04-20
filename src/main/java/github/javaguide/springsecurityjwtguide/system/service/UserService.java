@@ -1,10 +1,10 @@
 package github.javaguide.springsecurityjwtguide.system.service;
 
+import github.javaguide.springsecurityjwtguide.security.dto.UserRegisterRequest;
 import github.javaguide.springsecurityjwtguide.system.entity.Role;
 import github.javaguide.springsecurityjwtguide.system.entity.User;
 import github.javaguide.springsecurityjwtguide.system.entity.UserRole;
 import github.javaguide.springsecurityjwtguide.system.enums.RoleType;
-import github.javaguide.springsecurityjwtguide.system.enums.UserStatus;
 import github.javaguide.springsecurityjwtguide.system.exception.UserNameAlreadyExistException;
 import github.javaguide.springsecurityjwtguide.system.repository.RoleRepository;
 import github.javaguide.springsecurityjwtguide.system.repository.UserRepository;
@@ -16,9 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -33,23 +31,32 @@ public class UserService {
     private final UserRoleRepository userRoleRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public void saveUser(Map<String, String> registerUser) {
-        Optional<User> optionalUser = userRepository.findByUsername(registerUser.get("username"));
+    public void saveUser(UserRegisterRequest userRegisterRequest) {
+        User user = getUser(userRegisterRequest);
+        userRepository.save(user);
+        Optional<Role> roleRepositoryByName = roleRepository.findByName(RoleType.USER);
+        if (roleRepositoryByName.isPresent()) {
+            userRoleRepository.save(new UserRole(user, roleRepositoryByName.get()));
+        } else {
+            Role studentRole = roleRepository.save(new Role(RoleType.USER, "学生"));
+            userRoleRepository.save(new UserRole(user, studentRole));
+        }
+    }
+
+    private User getUser(UserRegisterRequest userRegisterRequest) {
+        String fullName = userRegisterRequest.getFullName();
+        String userName = userRegisterRequest.getUserName();
+        String password = userRegisterRequest.getPassword();
+        checkUserNameNotExist(userName);
+        return User.builder().fullName(fullName)
+                .username(userName)
+                .password(bCryptPasswordEncoder.encode(password)).build();
+    }
+
+    private void checkUserNameNotExist(String userName) {
+        Optional<User> optionalUser = userRepository.findByUsername(userName);
         if (optionalUser.isPresent()) {
             throw new UserNameAlreadyExistException("User name already exist!Please choose another user name.");
-        }
-        User user = new User();
-        user.setUsername(registerUser.get("username"));
-        user.setPassword(bCryptPasswordEncoder.encode(registerUser.get("password")));
-        Optional<Role> roleRepositoryByName = roleRepository.findByName(RoleType.STUDENT);
-        user.setStatus(UserStatus.CAN_USE);
-        userRepository.save(user);
-        if (roleRepositoryByName.isPresent()){
-            UserRole userRole= new UserRole(user,roleRepositoryByName.get());
-            userRoleRepository.save(userRole);
-        }else {
-            Role studentRole = roleRepository.save(new Role(RoleType.STUDENT, "学生"));
-            userRoleRepository.save(new UserRole(user,studentRole));
         }
     }
 

@@ -1,5 +1,6 @@
 package github.javaguide.springsecurityjwtguide.security.controller;
 
+import github.javaguide.springsecurityjwtguide.security.dto.UserRegisterRequest;
 import github.javaguide.springsecurityjwtguide.system.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -7,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import javax.validation.Valid;
 
 
 /**
@@ -24,8 +25,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity registerUser(@RequestBody Map<String, String> registerUser) {
-        userService.saveUser(registerUser);
+    public ResponseEntity registerUser(@RequestBody @Valid UserRegisterRequest userRegisterRequest) {
+        userService.saveUser(userRegisterRequest);
         return ResponseEntity.ok().build();
     }
 }
