@@ -1,6 +1,5 @@
 package github.javaguide.springsecurityjwtguide.security.config;
 
-import github.javaguide.springsecurityjwtguide.security.constants.SecurityConstants;
 import github.javaguide.springsecurityjwtguide.security.exception.JwtAccessDeniedHandler;
 import github.javaguide.springsecurityjwtguide.security.exception.JwtAuthenticationEntryPoint;
 import github.javaguide.springsecurityjwtguide.security.filter.JwtAuthenticationFilter;
@@ -17,7 +16,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
 /**

@@ -28,7 +28,7 @@ public class ErrorReponse {
         this(errorCode.getCode(), errorCode.getStatus().value(), errorCode.getMessage(), path, null);
     }
 
-    public ErrorReponse(int code, int status, String message, String path, Map<String, Object> data) {
+    private ErrorReponse(int code, int status, String message, String path, Map<String, Object> data) {
         this.code = code;
         this.status = status;
         this.message = message;

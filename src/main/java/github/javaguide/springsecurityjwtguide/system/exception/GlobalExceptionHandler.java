@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BaseException.class)
-    public ResponseEntity<?> handleAppException(BaseException ex, HttpServletRequest request) {
+    public ResponseEntity<?> handleBaseException(BaseException ex, HttpServletRequest request) {
         ErrorReponse representation = new ErrorReponse(ex, request.getRequestURI());
         return new ResponseEntity<>(representation, new HttpHeaders(), ex.getErrorCode().getStatus());
     }

@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * @author shuang.kou
  */
-public abstract class BaseException extends RuntimeException {
+abstract class BaseException extends RuntimeException {
     private final ErrorCode errorCode;
     private final HashMap<String, Object> data = new HashMap<>();
 
@@ -20,7 +20,7 @@ public abstract class BaseException extends RuntimeException {
         }
     }
 
-    protected BaseException(ErrorCode errorCode, Map<String, Object> data, Throwable cause) {
+    BaseException(ErrorCode errorCode, Map<String, Object> data, Throwable cause) {
         super(errorCode.getMessage(), cause);
         this.errorCode = errorCode;
         if (!ObjectUtils.isEmpty(data)) {

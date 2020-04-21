@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
  */
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private ThreadLocal<Boolean> rememberMe = new ThreadLocal<>();
-    private AuthenticationManager authenticationManager;
+    private final ThreadLocal<Boolean> rememberMe = new ThreadLocal<>();
+    private final AuthenticationManager authenticationManager;
 
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
