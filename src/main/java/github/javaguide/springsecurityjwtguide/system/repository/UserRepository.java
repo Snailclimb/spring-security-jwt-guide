@@ -13,11 +13,9 @@ import java.util.Optional;
  * @author shuang.kou
  */
 public interface UserRepository extends JpaRepository<User, Integer> {
-    Optional<User> findByUsername(String username);
+    Optional<User> findByUserName(String username);
 
     @Transactional
-    void deleteByUsername( String username);
-
-//    @Query("select status from user where username= :username")
-//    Optional<String> findUserStatusByName(@Param("username") String username);
+    // TODO NOT WORK
+    void deleteByUserName(String userName);
 }

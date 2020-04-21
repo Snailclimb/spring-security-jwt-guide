@@ -26,8 +26,10 @@ public class SwaggerConfig {
         List<Parameter> pars = new ArrayList<>();
         ticketPar.name(SecurityConstants.TOKEN_HEADER).description("user token")
                 .modelRef(new ModelRef("string")).parameterType("header")
-                .required(false).build(); //header中的ticket参数非必填，传空也可以
-        pars.add(ticketPar.build());    //根据每个方法名也知道当前方法在设置什么参数
+                //header中的ticket参数非必填，传空也可以
+                .required(false).build();
+        //根据每个方法名也知道当前方法在设置什么参数
+        pars.add(ticketPar.build());
 
 
         return new Docket(DocumentationType.SWAGGER_2)
@@ -38,6 +40,7 @@ public class SwaggerConfig {
                 .build()
                 .globalOperationParameters(pars);
     }
+
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("Spring Security JWT Guide")

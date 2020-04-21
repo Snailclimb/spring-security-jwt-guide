@@ -2,8 +2,8 @@ package github.javaguide.springsecurityjwtguide.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import github.javaguide.springsecurityjwtguide.security.constants.SecurityConstants;
+import github.javaguide.springsecurityjwtguide.security.dto.LoginRequest;
 import github.javaguide.springsecurityjwtguide.security.entity.JwtUser;
-import github.javaguide.springsecurityjwtguide.security.entity.LoginUser;
 import github.javaguide.springsecurityjwtguide.security.utils.JwtTokenUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,12 +41,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             // 获取登录的信息
-            LoginUser loginUser = objectMapper.readValue(request.getInputStream(), LoginUser.class);
-            rememberMe.set(loginUser.getRememberMe());
+            LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
+            rememberMe.set(loginRequest.getRememberMe());
             // 这部分和attemptAuthentication方法中的源码是一样的，
             // 只不过由于这个方法源码的是把用户名和密码这些参数的名字是死的，所以我们重写了一下
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    loginUser.getUsername(), loginUser.getPassword());
+                    loginRequest.getUsername(), loginRequest.getPassword());
             return authenticationManager.authenticate(authentication);
         } catch (IOException e) {
             e.printStackTrace();

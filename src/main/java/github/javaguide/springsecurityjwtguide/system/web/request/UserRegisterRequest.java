@@ -1,4 +1,4 @@
-package github.javaguide.springsecurityjwtguide.system.dto;
+package github.javaguide.springsecurityjwtguide.system.web.request;
 
 
 import github.javaguide.springsecurityjwtguide.system.validator.FullName;

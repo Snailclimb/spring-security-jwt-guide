@@ -1,6 +1,8 @@
 package github.javaguide.springsecurityjwtguide.system.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import github.javaguide.springsecurityjwtguide.system.web.representation.UserRepresentation;
+import github.javaguide.springsecurityjwtguide.system.web.request.UserRegisterRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,8 +35,11 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
+    @Column(nullable = false)
+    private String userName;
+    @Column(nullable = false)
     private String fullName;
+    @Column(nullable = false)
     private String password;
     @Column(columnDefinition = "tinyint(1) default 1")
     private Boolean enabled;
@@ -49,5 +54,17 @@ public class User {
         roles.forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName())));
         return authorities;
     }
+
+    public UserRepresentation toUserRepresentation() {
+        return UserRepresentation.builder().fullName(this.fullName)
+                .userName(this.userName).build();
+    }
+
+    public static User of(UserRegisterRequest userRegisterRequest) {
+        return User.builder().fullName(userRegisterRequest.getFullName())
+                .userName(userRegisterRequest.getUserName())
+                .enabled(true).build();
+    }
+
 
 }

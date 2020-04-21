@@ -271,12 +271,12 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             // 从输入流中获取到登录的信息
-            LoginUser loginUser = objectMapper.readValue(request.getInputStream(), LoginUser.class);
-            rememberMe.set(loginUser.getRememberMe());
+            LoginUser loginRequest = objectMapper.readValue(request.getInputStream(), LoginUser.class);
+            rememberMe.set(loginRequest.getRememberMe());
             // 这部分和attemptAuthentication方法中的源码是一样的，
             // 只不过由于这个方法源码的是把用户名和密码这些参数的名字是死的，所以我们重写了一下
             UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
-                    loginUser.getUsername(), loginUser.getPassword());
+                    loginRequest.getUsername(), loginRequest.getPassword());
             return authenticationManager.authenticate(authRequest);
         } catch (IOException e) {
             e.printStackTrace();
