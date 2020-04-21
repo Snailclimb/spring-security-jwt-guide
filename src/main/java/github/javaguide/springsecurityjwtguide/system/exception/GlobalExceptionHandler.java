@@ -1,6 +1,5 @@
 package github.javaguide.springsecurityjwtguide.system.exception;
 
-import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,12 +34,4 @@ public class GlobalExceptionHandler {
         ErrorReponse errorReponse = new ErrorReponse(ex, request.getRequestURI());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorReponse);
     }
-
-// TODO remove below code
-
-//    @ExceptionHandler(value = SignatureException.class)
-//    public ResponseEntity<ErrorReponse> handleSignatureException(SignatureException ex, HttpServletRequest request) {
-//        ErrorReponse errorReponse = new ErrorReponse(ErrorCode.VERIFY_JWT_FAILED, request.getRequestURI());
-//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorReponse);
-//    }
 }
