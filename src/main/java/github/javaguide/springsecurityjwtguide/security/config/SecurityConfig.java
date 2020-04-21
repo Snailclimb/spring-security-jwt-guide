@@ -1,5 +1,6 @@
 package github.javaguide.springsecurityjwtguide.security.config;
 
+import github.javaguide.springsecurityjwtguide.security.constants.SecurityConstants;
 import github.javaguide.springsecurityjwtguide.security.exception.JwtAccessDeniedHandler;
 import github.javaguide.springsecurityjwtguide.security.exception.JwtAuthenticationEntryPoint;
 import github.javaguide.springsecurityjwtguide.security.filter.JwtAuthenticationFilter;
@@ -16,6 +17,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
 /**
@@ -62,7 +64,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 //添加自定义Filter
                 .addFilter(new JwtAuthenticationFilter(authenticationManager()))
-                .addFilter(new JwtAuthorizationFilter(authenticationManager()))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), userDetailsServiceImpl))
                 // 不需要session（不创建会话）
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 // 授权异常处理

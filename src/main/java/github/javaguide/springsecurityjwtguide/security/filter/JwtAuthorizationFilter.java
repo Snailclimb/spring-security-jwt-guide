@@ -1,14 +1,18 @@
 package github.javaguide.springsecurityjwtguide.security.filter;
 
 import github.javaguide.springsecurityjwtguide.security.constants.SecurityConstants;
+import github.javaguide.springsecurityjwtguide.security.service.UserDetailsServiceImpl;
 import github.javaguide.springsecurityjwtguide.security.utils.JwtTokenUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -26,13 +30,15 @@ import java.util.logging.Logger;
  *
  * @author shuang.kou
  */
-
+@Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
+    private UserDetailsServiceImpl userDetailsService;
     private static final Logger logger = Logger.getLogger(JwtAuthorizationFilter.class.getName());
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserDetailsServiceImpl userDetailsService) {
         super(authenticationManager);
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -40,11 +46,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
 
-        String authorization = request.getHeader(SecurityConstants.TOKEN_HEADER);
-        if (authorization == null || !authorization.startsWith(SecurityConstants.TOKEN_PREFIX)) {
+        String token = request.getHeader(SecurityConstants.TOKEN_HEADER);
+        if (token == null || !token.startsWith(SecurityConstants.TOKEN_PREFIX)) {
             SecurityContextHolder.clearContext();
         } else {
-            SecurityContextHolder.getContext().setAuthentication(getAuthentication(authorization));
+            UsernamePasswordAuthenticationToken authentication = getAuthentication(token);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         chain.doFilter(request, response);
     }
@@ -53,15 +60,16 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
      * 获取用户认证信息 Authentication
      */
     private UsernamePasswordAuthenticationToken getAuthentication(String authorization) {
+        log.info("get authentication");
         String token = authorization.replace(SecurityConstants.TOKEN_PREFIX, "");
         try {
             String username = JwtTokenUtils.getUsernameByToken(token);
             logger.info("checking username:" + username);
-            // 通过 token 获取用户具有的角色
-            // TODO 实时从数据库中获取
-            List<SimpleGrantedAuthority> userRolesByToken = JwtTokenUtils.getUserRolesByToken(token);
             if (!StringUtils.isEmpty(username)) {
-                return new UsernamePasswordAuthenticationToken(username, null, userRolesByToken);
+                // 这里我们是又从数据库拿了一遍
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, null, userDetails.getAuthorities());
+                return userDetails.isEnabled() ? usernamePasswordAuthenticationToken : null;
             }
         } catch (SignatureException | ExpiredJwtException | MalformedJwtException | IllegalArgumentException exception) {
             logger.warning("Request to parse JWT with invalid signature . Detail : " + exception.getMessage());

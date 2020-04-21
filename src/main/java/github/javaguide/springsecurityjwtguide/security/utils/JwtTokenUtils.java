@@ -28,20 +28,21 @@ public class JwtTokenUtils {
 
     public static String createToken(String username, List<String> roles, boolean isRememberMe) {
         long expiration = isRememberMe ? SecurityConstants.EXPIRATION_REMEMBER : SecurityConstants.EXPIRATION;
-
+        final Date createdDate = new Date();
+        final Date expirationDate = new Date(createdDate.getTime() + expiration * 1000);
         String tokenPrefix = Jwts.builder()
-                .setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)
+                .setHeaderParam("type", SecurityConstants.TOKEN_TYPE)
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .claim(SecurityConstants.ROLE_CLAIMS, String.join(",", roles))
                 .setIssuer("SnailClimb")
-                .setIssuedAt(new Date())
+                .setIssuedAt(createdDate)
                 .setSubject(username)
-                .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
+                .setExpiration(expirationDate)
                 .compact();
         return SecurityConstants.TOKEN_PREFIX + tokenPrefix;
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         Date expiredDate = getTokenBody(token).getExpiration();
         return expiredDate.before(new Date());
     }
@@ -50,9 +51,11 @@ public class JwtTokenUtils {
         return getTokenBody(token).getSubject();
     }
 
+
     /**
-     * 获取用户所有角色
+     * 弃用。改为从数据库中获取，保证权限的即时性。
      */
+    @Deprecated
     public static List<SimpleGrantedAuthority> getUserRolesByToken(String token) {
         String role = (String) getTokenBody(token)
                 .get(SecurityConstants.ROLE_CLAIMS);

@@ -36,9 +36,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorReponse);
     }
 
-    @ExceptionHandler(value = SignatureException.class)
-    public ResponseEntity<ErrorReponse> handleSignatureException(SignatureException ex, HttpServletRequest request) {
-        ErrorReponse errorReponse = new ErrorReponse(ErrorCode.VERIFY_JWT_FAILED, request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorReponse);
-    }
+// TODO remove below code
+
+//    @ExceptionHandler(value = SignatureException.class)
+//    public ResponseEntity<ErrorReponse> handleSignatureException(SignatureException ex, HttpServletRequest request) {
+//        ErrorReponse errorReponse = new ErrorReponse(ErrorCode.VERIFY_JWT_FAILED, request.getRequestURI());
+//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorReponse);
+//    }
 }
