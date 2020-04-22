@@ -1,9 +1,9 @@
 package github.javaguide.springsecurityjwtguide.system.web.controller;
 
 import github.javaguide.springsecurityjwtguide.security.utils.CurrentUserUtils;
+import github.javaguide.springsecurityjwtguide.system.service.UserService;
 import github.javaguide.springsecurityjwtguide.system.web.representation.UserRepresentation;
 import github.javaguide.springsecurityjwtguide.system.web.request.UserRegisterRequest;
-import github.javaguide.springsecurityjwtguide.system.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,7 +31,7 @@ public class UserController {
     private final CurrentUserUtils currentUserUtils;
 
     @PostMapping("/sign-up")
-    public ResponseEntity registerUser(@RequestBody @Valid UserRegisterRequest userRegisterRequest) {
+    public ResponseEntity signUp(@RequestBody @Valid UserRegisterRequest userRegisterRequest) {
         userService.save(userRegisterRequest);
         return ResponseEntity.ok().build();
     }
