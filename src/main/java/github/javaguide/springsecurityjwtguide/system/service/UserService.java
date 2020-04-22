@@ -7,7 +7,7 @@ import github.javaguide.springsecurityjwtguide.system.entity.Role;
 import github.javaguide.springsecurityjwtguide.system.entity.User;
 import github.javaguide.springsecurityjwtguide.system.entity.UserRole;
 import github.javaguide.springsecurityjwtguide.system.enums.RoleType;
-import github.javaguide.springsecurityjwtguide.system.exception.NotFoundException;
+import github.javaguide.springsecurityjwtguide.system.exception.ResourceNotFoundException;
 import github.javaguide.springsecurityjwtguide.system.exception.UserNameAlreadyExistException;
 import github.javaguide.springsecurityjwtguide.system.repository.RoleRepository;
 import github.javaguide.springsecurityjwtguide.system.repository.UserRepository;
@@ -37,14 +37,14 @@ public class UserService {
         user.setPassword(bCryptPasswordEncoder.encode(userRegisterRequest.getPassword()));
         userRepository.save(user);
         //给用户绑定两个角色：用户和管理者
-        Role studentRole = roleRepository.findByName(RoleType.USER.getName()).orElseThrow(() -> new NotFoundException(ImmutableMap.of("roleName", RoleType.USER.getName())));
-        Role managerRole = roleRepository.findByName(RoleType.MANAGER.getName()).orElseThrow(() -> new NotFoundException(ImmutableMap.of("roleName", RoleType.MANAGER.getName())));
+        Role studentRole = roleRepository.findByName(RoleType.USER.getName()).orElseThrow(() -> new ResourceNotFoundException(ImmutableMap.of("roleName", RoleType.USER.getName())));
+        Role managerRole = roleRepository.findByName(RoleType.MANAGER.getName()).orElseThrow(() -> new ResourceNotFoundException(ImmutableMap.of("roleName", RoleType.MANAGER.getName())));
         userRoleRepository.save(new UserRole(user, studentRole));
         userRoleRepository.save(new UserRole(user, managerRole));
     }
 
     public User find(String userName) {
-        return userRepository.findByUserName(userName).orElseThrow(() -> new NotFoundException(ImmutableMap.of("username", userName)));
+        return userRepository.findByUserName(userName).orElseThrow(() -> new ResourceNotFoundException(ImmutableMap.of("username", userName)));
     }
 
     public void delete(String userName) {

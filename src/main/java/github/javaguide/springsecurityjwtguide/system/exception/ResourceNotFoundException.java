@@ -5,8 +5,8 @@ import java.util.Map;
 /**
  * @author shuang.kou
  */
-public class NotFoundException extends BaseException {
-    public NotFoundException(Map<String, Object> data) {
+public class ResourceNotFoundException extends BaseException {
+    public ResourceNotFoundException(Map<String, Object> data) {
         super(ErrorCode.NOT_FOUND, data);
     }
 }

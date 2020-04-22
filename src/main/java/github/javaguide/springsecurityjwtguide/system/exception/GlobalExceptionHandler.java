@@ -1,5 +1,6 @@
 package github.javaguide.springsecurityjwtguide.system.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -18,11 +19,13 @@ import java.util.Map;
  */
 @ControllerAdvice
 @ResponseBody
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<?> handleBaseException(BaseException ex, HttpServletRequest request) {
         ErrorReponse errorReponse = new ErrorReponse(ex, request.getRequestURI());
+        log.error("occur BaseException:" + errorReponse.toString());
         return ResponseEntity.status(ex.getErrorCode().getStatus()).body(errorReponse);
     }
 
@@ -37,19 +40,23 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        ErrorReponse errorReponse = new ErrorReponse(ErrorCode.VERIFY_JWT_FAILED, request.getRequestURI(), errors);
+        ErrorReponse errorReponse = new ErrorReponse(ErrorCode.METHOD_ARGUMENT_NOT_VALID, request.getRequestURI(), errors);
+        log.error("occur MethodArgumentNotValidException:" + errorReponse.toString());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorReponse);
     }
 
     @ExceptionHandler(value = UserNameAlreadyExistException.class)
     public ResponseEntity<ErrorReponse> handleUserNameAlreadyExistException(UserNameAlreadyExistException ex, HttpServletRequest request) {
         ErrorReponse errorReponse = new ErrorReponse(ex, request.getRequestURI());
+        log.error("occur UserNameAlreadyExistException:" + errorReponse.toString());
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorReponse);
     }
 
-    @ExceptionHandler(value = NotFoundException.class)
-    public ResponseEntity<ErrorReponse> handleUserNotFoundException(NotFoundException ex, HttpServletRequest request) {
+    @ExceptionHandler(value = ResourceNotFoundException.class)
+    public ResponseEntity<ErrorReponse> handleUserNotFoundException(ResourceNotFoundException ex, HttpServletRequest request) {
         ErrorReponse errorReponse = new ErrorReponse(ex, request.getRequestURI());
+        log.error("occur ResourceNotFoundException:" + errorReponse.toString());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorReponse);
     }
 }
