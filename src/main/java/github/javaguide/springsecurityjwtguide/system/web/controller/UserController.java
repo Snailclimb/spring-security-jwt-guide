@@ -4,6 +4,7 @@ import github.javaguide.springsecurityjwtguide.security.utils.CurrentUserUtils;
 import github.javaguide.springsecurityjwtguide.system.service.UserService;
 import github.javaguide.springsecurityjwtguide.system.web.representation.UserRepresentation;
 import github.javaguide.springsecurityjwtguide.system.web.request.UserRegisterRequest;
+import github.javaguide.springsecurityjwtguide.system.web.request.UserUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,6 +44,13 @@ public class UserController {
         System.out.println("当前访问该接口的用户为：" + currentUserUtils.getCurrentUser().getUserName());
         Page<UserRepresentation> allUser = userService.getAll(pageNum, pageSize);
         return ResponseEntity.ok().body(allUser);
+    }
+
+    @PutMapping
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    public ResponseEntity update(@RequestBody @Valid UserUpdateRequest userUpdateRequest) {
+        userService.update(userUpdateRequest);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping

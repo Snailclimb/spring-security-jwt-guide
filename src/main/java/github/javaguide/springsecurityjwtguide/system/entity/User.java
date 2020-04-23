@@ -3,6 +3,7 @@ package github.javaguide.springsecurityjwtguide.system.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import github.javaguide.springsecurityjwtguide.system.web.representation.UserRepresentation;
 import github.javaguide.springsecurityjwtguide.system.web.request.UserRegisterRequest;
+import github.javaguide.springsecurityjwtguide.system.web.request.UserUpdateRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +20,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -30,7 +32,7 @@ import java.util.stream.Collectors;
 @Builder
 @Entity
 @Table(name = "user")
-public class User {
+public class User extends AbstractAuditBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,5 +68,16 @@ public class User {
                 .enabled(true).build();
     }
 
+    public void updateFrom(UserUpdateRequest userUpdateRequest) {
+        if (Objects.nonNull(userUpdateRequest.getFullName())) {
+            this.setFullName(userUpdateRequest.getFullName());
+        }
+        if (Objects.nonNull(userUpdateRequest.getPassword())) {
+            this.setPassword(userUpdateRequest.getPassword());
+        }
+        if (Objects.nonNull(userUpdateRequest.getEnabled())) {
+            this.setEnabled(userUpdateRequest.getEnabled());
+        }
+    }
 
 }

@@ -16,7 +16,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Entity
 @Table(name = "user_role")
-public class UserRole implements Serializable {
+public class UserRole extends AbstractAuditBase implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

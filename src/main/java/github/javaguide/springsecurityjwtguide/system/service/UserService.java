@@ -12,6 +12,7 @@ import github.javaguide.springsecurityjwtguide.system.exception.UserNameAlreadyE
 import github.javaguide.springsecurityjwtguide.system.repository.RoleRepository;
 import github.javaguide.springsecurityjwtguide.system.repository.UserRepository;
 import github.javaguide.springsecurityjwtguide.system.repository.UserRoleRepository;
+import github.javaguide.springsecurityjwtguide.system.web.request.UserUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -46,6 +47,13 @@ public class UserService {
     public User find(String userName) {
         return userRepository.findByUserName(userName).orElseThrow(() -> new ResourceNotFoundException(ImmutableMap.of("username", userName)));
     }
+
+    public void update(UserUpdateRequest userUpdateRequest) {
+        User user = userRepository.findByUserName(userUpdateRequest.getUserName()).orElseThrow(() -> new ResourceNotFoundException(ImmutableMap.of("username", userUpdateRequest.getUserName())));
+        user.updateFrom(userUpdateRequest);
+        userRepository.save(user);
+    }
+
 
     public void delete(String userName) {
         userRepository.deleteByUserName(userName);
