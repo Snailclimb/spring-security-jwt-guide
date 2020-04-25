@@ -9,7 +9,7 @@ import java.io.IOException;
 
 /**
  * @author shuang.kou
- * AccessDeineHandler 用来解决认证过的用户访问无权限资源时的异常
+ * @description AccessDeineHandler 用来解决认证过的用户访问无权限资源时的异常
  */
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     /**

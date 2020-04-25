@@ -20,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
  * @author shuang.kou
+ * @description Spring Security配置类
  */
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)

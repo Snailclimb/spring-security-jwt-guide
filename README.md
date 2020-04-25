@@ -4,6 +4,7 @@
 
 **如果国内访问缓慢的话，可以通过码云查看：** https://gitee.com/SnailClimb/spring-security-jwt-guide 。
 
+
 ## 相关文档
 
 - [JWT 优缺点分析以及常见问题解决方案](https://github.com/Snailclimb/JavaGuide/blob/master/docs/system-design/authority-certification/JWT-advantages-and-disadvantages.md)
@@ -17,13 +18,12 @@
 
 刚来公司的时候的入职培训实战项目以及现在正在做的项目都用到了 Spring Security 这个强大的安全验证框架，可以看出这个框架在身份验证以及权限验证领域可以说应该是比较不错的选择。由于之前经历项目的这部分模块都不是自己做的，所以对于 Spring Security 并不是太熟悉。于是自/己抽时间对这部分知识学习了一下，并实现了一个简单的 Demo 。这个 Demo 主要用到了 **Spring Security** 和 **Spring Boot** 这两门技术，并且所有的依赖采用的都是最新的稳定版本。初次之外，这个项目还用到了 JPA 这门技术。项目代码结构如下(chrome 插件：Octoree)，整体还是比较清晰的，由于自己的能力以及时间有限，所以一定还有很多可以优化的地方，有兴趣的朋友可以一起完善，期待你的 PR。
 
-![代码结构](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/2019-7/代码结构.png)
+
 
 ## 下载配置
 
 1. git clone https://github.com/Snailclimb/spring-security-jwt-guide.git
 2. 打开项目并且等待 Maven 下载好相关依赖。建议使用 Intellij IDEA 打开，并确保你的 Intellij IDEA 下载了 lombok 插件。
-3. 修改 `application.properties` 将数据库连接信息改成你自己的。
 4. 运行项目（相关数据表会被自动创建，不了解的看一下 JPA）
 
 ## 示例

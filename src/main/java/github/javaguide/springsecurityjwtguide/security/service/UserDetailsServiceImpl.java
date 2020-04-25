@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * @author shuang.kou
+ * @description UserDetailsService实现类
  */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -20,6 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetailsServiceImpl(UserService userService) {
         this.userService = userService;
     }
+
     @Override
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
         User user = userService.find(name);

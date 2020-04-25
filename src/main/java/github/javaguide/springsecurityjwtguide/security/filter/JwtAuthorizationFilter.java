@@ -22,9 +22,8 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
- * 过滤器处理所有HTTP请求，并检查是否存在带有正确令牌的Authorization标头。例如，如果令牌未过期或签名密钥正确。
- *
  * @author shuang.kou
+ * @description 过滤器处理所有HTTP请求，并检查是否存在带有正确令牌的Authorization标头。例如，如果令牌未过期或签名密钥正确。
  */
 @Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
@@ -62,7 +61,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             String username = JwtTokenUtils.getUsernameByToken(token);
             logger.info("checking username:" + username);
             if (!StringUtils.isEmpty(username)) {
-                // 这里我们是又从数据库拿了一遍
+                // 这里我们是又从数据库拿了一遍,避免用户的角色信息有变
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, null, userDetails.getAuthorities());
                 return userDetails.isEnabled() ? usernamePasswordAuthenticationToken : null;

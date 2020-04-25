@@ -2,6 +2,7 @@ package github.javaguide.springsecurityjwtguide.security.constants;
 
 /**
  * @author shuang.kou
+ * @description Spring Security相关配置常量
  */
 public class SecurityConstants {
 

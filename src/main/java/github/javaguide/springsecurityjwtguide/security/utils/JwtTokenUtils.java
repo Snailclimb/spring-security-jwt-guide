@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author shuang.kou
+ * @description JWT工具类
  */
 public class JwtTokenUtils {
 

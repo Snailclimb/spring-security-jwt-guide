@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author shuang.kou
- * 如果用户名和密码正确，那么过滤器将创建一个JWT Token 并在HTTP Response 的header中返回它，格式：token: "Bearer +具体token值"
+ * @description 如果用户名和密码正确，那么过滤器将创建一个JWT Token 并在HTTP Response 的header中返回它，格式：token: "Bearer +具体token值"
  */
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 

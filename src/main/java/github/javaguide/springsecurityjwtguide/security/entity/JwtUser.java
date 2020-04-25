@@ -8,6 +8,7 @@ import java.util.Collection;
 
 /**
  * @author shuang.kou
+ * @description JWT用户对象
  */
 public class JwtUser implements UserDetails {
 

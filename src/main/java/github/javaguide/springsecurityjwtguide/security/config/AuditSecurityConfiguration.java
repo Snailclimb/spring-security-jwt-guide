@@ -1,7 +1,5 @@
 package github.javaguide.springsecurityjwtguide.security.config;
 
-import github.javaguide.springsecurityjwtguide.system.entity.User;
-import github.javaguide.springsecurityjwtguide.system.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -12,6 +10,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 
+/**
+ * @author shuang.kou
+ * @description 审计功能配置类
+ */
 @Configuration
 @EnableJpaAuditing
 public class AuditSecurityConfiguration {

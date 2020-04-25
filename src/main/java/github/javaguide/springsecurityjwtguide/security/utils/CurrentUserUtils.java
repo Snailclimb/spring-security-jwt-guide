@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author shuang.kou
- * 获取当前请求的用户
+ * @description 获取当前请求的用户
  */
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
