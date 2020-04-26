@@ -1,9 +1,25 @@
-# spring-security-jwt-guide
 
-[English version](https://github.com/Snailclimb/spring-security-jwt-guide/blob/master/README-ENGLISH.md)
+# spring-security-jwt-guide
 
 **如果国内访问缓慢的话，可以通过码云查看：** https://gitee.com/SnailClimb/spring-security-jwt-guide 。
 
+
+## 目录
+
+
+- [相关文档](#相关文档)
+- [介绍](#介绍)
+- [你能学习到什么](#你能学习到什么)
+- [项目概览](#项目概览)
+- [如何运行项目](#如何运行项目)
+- [示例](#示例)
+    - [1.注册一个账号](#1注册一个账号)
+    - [2.登录](#2登录)
+    - [3.使用正确 Token 访问需要进行身份验证的资源](#3使用正确-token-访问需要进行身份验证的资源)
+    - [4.不带 Token 或者使用无效 Token 访问](#4不带-token-或者使用无效-token-访问)
+    - [5.带了正确Token但是访问权限](#5带了正确token但是访问权限)
+- [代办](#代办)
+- [参考](#参考)
 
 ## 相关文档
 
@@ -23,6 +39,13 @@
 
 1. Spring Security +JWT 实现登入登出以及权限校验
 2. JPA 实现审计功能、多对多的映射关系如何通过关联表实现
+
+## 项目概览
+
+为了区分，我把 Spring Security相关的都单独放在了一个文件夹下面。
+
+![](./pictures/structure.png)
+
 
 ## 如何运行项目
 
@@ -86,6 +109,19 @@
 我们使用 DELETE 请求访问 `/api/users?username=xxx`，携带有效的 token ，但是 token 的访问权限不够。
 
 ![](./pictures/not-have-enough-permission.png)
+
+## 代办
+
+- [x] 增加H2内存数据库支持，无须MySQL，一键启动项目启动后访问 `http://{host}:9333/h2-console/`
+- [x] 增加Swagger，方便调用接口
+- [x] 异常处理部分代码重构，优化返回结构
+- [x] 新建一个role表，然后通过新建一个role_user表的形式，将用户与角色关联起来
+- [x] 文件结构重构
+- [x] 增加jpa审计功能
+- [ ] login接口在controller层暴露出来
+- [ ] 重构详解文章
+- [ ] 增加checkstyle
+- [ ] 集成sonarqube
 
 ## 参考
 
