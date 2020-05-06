@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserService {
 
+    public static final String USERNAME = "username";
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;
@@ -45,11 +46,11 @@ public class UserService {
     }
 
     public User find(String userName) {
-        return userRepository.findByUserName(userName).orElseThrow(() -> new ResourceNotFoundException(ImmutableMap.of("username", userName)));
+        return userRepository.findByUserName(userName).orElseThrow(() -> new ResourceNotFoundException(ImmutableMap.of(USERNAME, userName)));
     }
 
     public void update(UserUpdateRequest userUpdateRequest) {
-        User user = userRepository.findByUserName(userUpdateRequest.getUserName()).orElseThrow(() -> new ResourceNotFoundException(ImmutableMap.of("username", userUpdateRequest.getUserName())));
+        User user = userRepository.findByUserName(userUpdateRequest.getUserName()).orElseThrow(() -> new ResourceNotFoundException(ImmutableMap.of(USERNAME, userUpdateRequest.getUserName())));
         user.updateFrom(userUpdateRequest);
         userRepository.save(user);
     }
@@ -66,7 +67,7 @@ public class UserService {
     private void checkUserNameNotExist(String userName) {
         boolean exist = userRepository.findByUserName(userName).isPresent();
         if (exist) {
-            throw new UserNameAlreadyExistException(ImmutableMap.of("username", userName));
+            throw new UserNameAlreadyExistException(ImmutableMap.of(USERNAME, userName));
         }
     }
 }

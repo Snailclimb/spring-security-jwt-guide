@@ -23,7 +23,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BaseException.class)
-    public ResponseEntity<?> handleBaseException(BaseException ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorReponse> handleBaseException(BaseException ex, HttpServletRequest request) {
         ErrorReponse errorReponse = new ErrorReponse(ex, request.getRequestURI());
         log.error("occur BaseException:" + errorReponse.toString());
         return ResponseEntity.status(ex.getErrorCode().getStatus()).body(errorReponse);
@@ -33,9 +33,9 @@ public class GlobalExceptionHandler {
      * 请求参数异常处理
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorReponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, HttpServletRequest request) {
         Map<String, Object> errors = new HashMap<>(8);
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
+        ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);

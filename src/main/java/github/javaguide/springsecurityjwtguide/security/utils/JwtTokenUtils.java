@@ -54,7 +54,7 @@ public class JwtTokenUtils {
 
 
     /**
-     * 弃用。改为从数据库中获取，保证权限的即时性。
+     * @deprecated 弃用。改为从数据库中获取，保证权限的即时性。
      */
     @Deprecated
     public static List<SimpleGrantedAuthority> getUserRolesByToken(String token) {

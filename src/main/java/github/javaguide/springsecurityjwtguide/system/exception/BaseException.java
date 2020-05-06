@@ -10,7 +10,7 @@ import java.util.Map;
  */
 abstract class BaseException extends RuntimeException {
     private final ErrorCode errorCode;
-    private final HashMap<String, Object> data = new HashMap<>();
+    private final transient HashMap<String, Object> data = new HashMap<>();
 
     public BaseException(ErrorCode errorCode, Map<String, Object> data) {
         super(errorCode.getMessage());
