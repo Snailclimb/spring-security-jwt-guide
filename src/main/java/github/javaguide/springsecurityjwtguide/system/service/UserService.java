@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author shuang.kou
@@ -33,6 +34,7 @@ public class UserService {
     private final UserRoleRepository userRoleRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Transactional(rollbackFor = Exception.class)
     public void save(UserRegisterRequest userRegisterRequest) {
         checkUserNameNotExist(userRegisterRequest.getUserName());
         User user = User.of(userRegisterRequest);
