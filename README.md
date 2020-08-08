@@ -65,7 +65,6 @@
 
 ```json
 {"userName":"123456","fullName":"shuangkou","password":"123456"}
-
 ```
 
 ![注册](./pictures/sign-up.png)
@@ -112,7 +111,7 @@
 
 ## 代办
 
-- [x] 增加H2内存数据库支持，无须MySQL，一键启动项目启动后访问 `http://{host}:9333/h2-console/`
+- [x] 增加H2内存数据库支持，无须MySQL，一键启动项目启动后访问 `http://{host}:9333/h2-console/` (数据库 url 地址、用户名和密码都在  `application.properties` 配置文件中)
 - [x] 增加Swagger，方便调用接口
 - [x] 异常处理部分代码重构，优化返回结构
 - [x] 新建一个role表，然后通过新建一个role_user表的形式，将用户与角色关联起来
