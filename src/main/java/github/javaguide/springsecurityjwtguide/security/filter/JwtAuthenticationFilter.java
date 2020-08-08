@@ -5,6 +5,7 @@ import github.javaguide.springsecurityjwtguide.security.constants.SecurityConsta
 import github.javaguide.springsecurityjwtguide.security.dto.LoginRequest;
 import github.javaguide.springsecurityjwtguide.security.entity.JwtUser;
 import github.javaguide.springsecurityjwtguide.security.utils.JwtTokenUtils;
+import github.javaguide.springsecurityjwtguide.system.exception.LoginFailedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -48,9 +49,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     loginRequest.getUsername(), loginRequest.getPassword());
             return authenticationManager.authenticate(authentication);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+        } catch (IOException | AuthenticationException e) {
+            if (e instanceof AuthenticationException) {
+                throw new LoginFailedException("登录失败！请检查用户名和密码。");
+            }
+            throw new LoginFailedException(e.getMessage());
         }
     }
 

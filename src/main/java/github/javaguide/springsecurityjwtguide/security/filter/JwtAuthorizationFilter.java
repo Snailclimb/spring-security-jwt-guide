@@ -3,6 +3,7 @@ package github.javaguide.springsecurityjwtguide.security.filter;
 import github.javaguide.springsecurityjwtguide.security.constants.SecurityConstants;
 import github.javaguide.springsecurityjwtguide.security.service.UserDetailsServiceImpl;
 import github.javaguide.springsecurityjwtguide.security.utils.JwtTokenUtils;
+import github.javaguide.springsecurityjwtguide.system.exception.UserNameNotFoundException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -66,7 +67,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, null, userDetails.getAuthorities());
                 return userDetails.isEnabled() ? usernamePasswordAuthenticationToken : null;
             }
-        } catch (SignatureException | ExpiredJwtException | MalformedJwtException | IllegalArgumentException exception) {
+        } catch (UserNameNotFoundException | SignatureException | ExpiredJwtException | MalformedJwtException | IllegalArgumentException exception) {
             logger.warning("Request to parse JWT with invalid signature . Detail : " + exception.getMessage());
         }
         return null;

@@ -18,4 +18,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Modifying
     @Transactional(rollbackFor = Exception.class)
     void deleteByUserName(String userName);
+
+    boolean existsByUserName(String username);
 }

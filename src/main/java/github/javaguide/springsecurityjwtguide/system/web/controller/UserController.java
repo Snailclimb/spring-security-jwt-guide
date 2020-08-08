@@ -33,7 +33,7 @@ public class UserController {
     private final CurrentUserUtils currentUserUtils;
 
     @PostMapping("/sign-up")
-    public ResponseEntity signUp(@RequestBody @Valid UserRegisterRequest userRegisterRequest) {
+    public ResponseEntity<Void> signUp(@RequestBody @Valid UserRegisterRequest userRegisterRequest) {
         userService.save(userRegisterRequest);
         return ResponseEntity.ok().build();
     }
@@ -48,14 +48,14 @@ public class UserController {
 
     @PutMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity update(@RequestBody @Valid UserUpdateRequest userUpdateRequest) {
+    public ResponseEntity<Void> update(@RequestBody @Valid UserUpdateRequest userUpdateRequest) {
         userService.update(userUpdateRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity deleteUserByUserName(@RequestParam("username") String username) {
+    public ResponseEntity<Void> deleteUserByUserName(@RequestParam("username") String username) {
         userService.delete(username);
         return ResponseEntity.ok().build();
     }
