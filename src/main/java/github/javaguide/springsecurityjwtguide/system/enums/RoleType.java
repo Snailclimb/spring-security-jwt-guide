@@ -12,8 +12,8 @@ public enum RoleType {
     TEMP_USER("TEMP_USER", "临时用户"),
     MANAGER("MANAGER", "管理者"),
     ADMIN("ADMIN", "Admin");
-    java.lang.String name;
-    java.lang.String description;
+    String name;
+    String description;
 
     RoleType(java.lang.String name, java.lang.String description) {
         this.name = name;

@@ -59,4 +59,6 @@ public class GlobalExceptionHandler {
         log.error("occur ResourceNotFoundException:" + errorResponse.toString());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
+
+
 }

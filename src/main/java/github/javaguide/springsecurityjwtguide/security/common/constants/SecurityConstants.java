@@ -1,15 +1,10 @@
-package github.javaguide.springsecurityjwtguide.security.constants;
+package github.javaguide.springsecurityjwtguide.security.common.constants;
 
 /**
  * @author shuang.kou
  * @description Spring Security相关配置常量
  */
-public class SecurityConstants {
-
-    /**
-     * 登录的地址
-     */
-    public static final String AUTH_LOGIN_URL = "/auth/login";
+public final class SecurityConstants {
 
     /**
      * 角色的key

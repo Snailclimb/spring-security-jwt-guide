@@ -1,6 +1,6 @@
 package github.javaguide.springsecurityjwtguide.system.web.controller;
 
-import github.javaguide.springsecurityjwtguide.security.utils.CurrentUserUtils;
+import github.javaguide.springsecurityjwtguide.security.common.utils.CurrentUserUtils;
 import github.javaguide.springsecurityjwtguide.system.service.UserService;
 import github.javaguide.springsecurityjwtguide.system.web.representation.UserRepresentation;
 import github.javaguide.springsecurityjwtguide.system.web.request.UserRegisterRequest;

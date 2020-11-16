@@ -1,4 +1,4 @@
-package github.javaguide.springsecurityjwtguide.security.utils;
+package github.javaguide.springsecurityjwtguide.security.common.utils;
 
 import github.javaguide.springsecurityjwtguide.system.entity.User;
 import github.javaguide.springsecurityjwtguide.system.service.UserService;

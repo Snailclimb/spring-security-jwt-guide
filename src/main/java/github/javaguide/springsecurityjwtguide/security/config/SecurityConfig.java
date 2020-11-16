@@ -2,19 +2,14 @@ package github.javaguide.springsecurityjwtguide.security.config;
 
 import github.javaguide.springsecurityjwtguide.security.exception.JwtAccessDeniedHandler;
 import github.javaguide.springsecurityjwtguide.security.exception.JwtAuthenticationEntryPoint;
-import github.javaguide.springsecurityjwtguide.security.filter.JwtAuthenticationFilter;
 import github.javaguide.springsecurityjwtguide.security.filter.JwtAuthorizationFilter;
-import github.javaguide.springsecurityjwtguide.security.service.UserDetailsServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
@@ -26,9 +21,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    UserDetailsServiceImpl userDetailsServiceImpl;
-
     /**
      * 密码编码器
      */
@@ -37,16 +29,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public UserDetailsService createUserDetailsService() {
-        return userDetailsServiceImpl;
-    }
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        // 设置自定义的userDetailsService以及密码编码器
-        auth.userDetailsService(userDetailsServiceImpl).passwordEncoder(bCryptPasswordEncoder());
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -54,7 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // 禁用 CSRF
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 // 指定路径下的资源需要验证了的用户才能访问
                 .antMatchers("/api/**").authenticated()
                 .antMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
@@ -62,8 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().permitAll()
                 .and()
                 //添加自定义Filter
-                .addFilter(new JwtAuthenticationFilter(authenticationManager()))
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), userDetailsServiceImpl))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager()))
                 // 不需要session（不创建会话）
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 // 授权异常处理

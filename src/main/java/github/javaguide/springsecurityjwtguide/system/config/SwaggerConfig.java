@@ -1,6 +1,6 @@
 package github.javaguide.springsecurityjwtguide.system.config;
 
-import github.javaguide.springsecurityjwtguide.security.constants.SecurityConstants;
+import github.javaguide.springsecurityjwtguide.security.common.constants.SecurityConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;

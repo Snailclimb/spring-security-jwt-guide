@@ -80,6 +80,10 @@ public class UserService {
         return userRepository.findAll(PageRequest.of(pageNum, pageSize)).map(User::toUserRepresentation);
     }
 
+    public boolean check(String currentPassword, String password) {
+        return this.bCryptPasswordEncoder.matches(currentPassword, password);
+    }
+
     private void ensureUserNameNotExist(String userName) {
         boolean exist = userRepository.findByUserName(userName).isPresent();
         if (exist) {

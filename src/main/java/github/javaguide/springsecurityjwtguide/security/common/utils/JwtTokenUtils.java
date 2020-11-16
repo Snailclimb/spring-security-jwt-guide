@@ -1,10 +1,11 @@
-package github.javaguide.springsecurityjwtguide.security.utils;
+package github.javaguide.springsecurityjwtguide.security.common.utils;
 
-import github.javaguide.springsecurityjwtguide.security.constants.SecurityConstants;
+import github.javaguide.springsecurityjwtguide.security.common.constants.SecurityConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.crypto.SecretKey;
@@ -40,35 +41,37 @@ public class JwtTokenUtils {
                 .setSubject(username)
                 .setExpiration(expirationDate)
                 .compact();
-        return SecurityConstants.TOKEN_PREFIX + tokenPrefix;
+        return SecurityConstants.TOKEN_PREFIX + tokenPrefix; // 添加 token 前缀 "Bearer ";
+    }
+
+    public static UsernamePasswordAuthenticationToken getAuthentication(String token) {
+        Claims claims = getClaims(token);
+        List<SimpleGrantedAuthority> authorities = getAuthorities(claims);
+        String userName = claims.getSubject();
+        return new UsernamePasswordAuthenticationToken(userName, token, authorities);
+
     }
 
     public boolean isTokenExpired(String token) {
-        Date expiredDate = getTokenBody(token).getExpiration();
+        Date expiredDate = getClaims(token).getExpiration();
         return expiredDate.before(new Date());
     }
 
-    public static String getUsernameByToken(String token) {
-        return getTokenBody(token).getSubject();
-    }
-
-
     /**
-     * @deprecated 弃用。改为从数据库中获取，保证权限的即时性。
+     * 可以改为从缓存中获取，保证权限的即时性。
      */
-    @Deprecated
-    public static List<SimpleGrantedAuthority> getUserRolesByToken(String token) {
-        String role = (String) getTokenBody(token)
-                .get(SecurityConstants.ROLE_CLAIMS);
+    private static List<SimpleGrantedAuthority> getAuthorities(Claims claims) {
+        String role = (String) claims.get(SecurityConstants.ROLE_CLAIMS);
         return Arrays.stream(role.split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }
 
-    private static Claims getTokenBody(String token) {
+    private static Claims getClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
     }
+
 }
