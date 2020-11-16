@@ -4,6 +4,7 @@ import github.javaguide.springsecurityjwtguide.security.common.constants.Securit
 import github.javaguide.springsecurityjwtguide.security.common.utils.JwtTokenUtils;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,8 +23,11 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager) {
+    private final StringRedisTemplate stringRedisTemplate;
+
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, StringRedisTemplate stringRedisTemplate) {
         super(authenticationManager);
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     @Override
@@ -34,17 +38,25 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String token = request.getHeader(SecurityConstants.TOKEN_HEADER);
         if (token == null || !token.startsWith(SecurityConstants.TOKEN_PREFIX)) {
             SecurityContextHolder.clearContext();
-        } else {
-            token = token.replace(SecurityConstants.TOKEN_PREFIX, "");
-            UsernamePasswordAuthenticationToken authentication = null;
-            try {
-                authentication = JwtTokenUtils.getAuthentication(token);
-            } catch (JwtException e) {
-                logger.error("Invalid jwt : " + e.getMessage());
-            }
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            chain.doFilter(request, response);
+            return;
         }
+        String tokenValue = token.replace(SecurityConstants.TOKEN_PREFIX, "");
+        String previousToken = stringRedisTemplate.opsForValue().get(JwtTokenUtils.getId(tokenValue));
+        if (!token.equals(previousToken)) {
+            SecurityContextHolder.clearContext();
+            chain.doFilter(request, response);
+            return;
+        }
+        UsernamePasswordAuthenticationToken authentication = null;
+        try {
+            authentication = JwtTokenUtils.getAuthentication(tokenValue);
+        } catch (JwtException e) {
+            logger.error("Invalid jwt : " + e.getMessage());
+        }
+        SecurityContextHolder.getContext().setAuthentication(authentication);
         chain.doFilter(request, response);
     }
-
 }
+
+

@@ -23,7 +23,6 @@
 
 ## 相关文档
 
-- [JWT 优缺点分析以及常见问题解决方案](https://github.com/Snailclimb/JavaGuide/blob/master/docs/system-design/authority-certification/JWT-advantages-and-disadvantages.md)
 - [项目讲解/分析](./docs/SpringSecurity介绍.md)
 
 ## 代办
@@ -35,6 +34,8 @@
 - [x] 文件结构重构
 - [x] 增加jpa审计功能
 - [x] login接口在controller层暴露出来
+- [x] 登出功能：redis保存token信息（key->user id,value->token），登出后将 redis中的token信息删除
+- [x] 重新登录将上一次登录生成的token弄失效（解决未过期的token还是可以用的问题）：重新登录会将 redis 中保存的 token 信息进行更新
 - [ ] 重构详解文章
 
 ## 介绍
