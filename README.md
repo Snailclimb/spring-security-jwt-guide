@@ -26,6 +26,17 @@
 - [JWT 优缺点分析以及常见问题解决方案](https://github.com/Snailclimb/JavaGuide/blob/master/docs/system-design/authority-certification/JWT-advantages-and-disadvantages.md)
 - [项目讲解/分析](./docs/SpringSecurity介绍.md)
 
+## 代办
+
+- [x] 增加H2内存数据库支持，无须MySQL，一键启动项目启动后访问 `http://{host}:9333/h2-console/` (数据库 url 地址、用户名和密码都在  `application.properties` 配置文件中)
+- [x] 增加Swagger，方便调用接口
+- [x] 异常处理部分代码重构，优化返回结构
+- [x] 新建一个role表，然后通过新建一个role_user表的形式，将用户与角色关联起来
+- [x] 文件结构重构
+- [x] 增加jpa审计功能
+- [x] login接口在controller层暴露出来
+- [ ] 重构详解文章
+
 ## 介绍
 
 [Spring Security](https://spring.io/projects/spring-security ) 是 Spring 全家桶中非常强大的一个用来做身份验证以及权限控制的框架，我们可以轻松地扩展它来满足我们当前系统安全性这方面的需求。
@@ -108,19 +119,6 @@
 我们使用 DELETE 请求访问 `/api/users?username=xxx`，携带有效的 token ，但是 token 的访问权限不够。
 
 ![](./pictures/not-have-enough-permission.png)
-
-## 代办
-
-- [x] 增加H2内存数据库支持，无须MySQL，一键启动项目启动后访问 `http://{host}:9333/h2-console/` (数据库 url 地址、用户名和密码都在  `application.properties` 配置文件中)
-- [x] 增加Swagger，方便调用接口
-- [x] 异常处理部分代码重构，优化返回结构
-- [x] 新建一个role表，然后通过新建一个role_user表的形式，将用户与角色关联起来
-- [x] 文件结构重构
-- [x] 增加jpa审计功能
-- [ ] login接口在controller层暴露出来
-- [ ] 重构详解文章
-- [ ] 增加checkstyle
-- [ ] 集成sonarqube
 
 ## 参考
 
