@@ -19,11 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
  **/
 @RestController
 @RequestMapping("/auth")
+// TODO 登出方法
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AuthController {
 
     private final AuthService authService;
 
+    // TODO 重新登录将上一次登录生成的token弄失效
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest) {
         String token = authService.getToken(loginRequest);
