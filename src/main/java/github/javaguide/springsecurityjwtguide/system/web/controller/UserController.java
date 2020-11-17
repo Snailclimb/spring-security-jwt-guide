@@ -1,6 +1,5 @@
 package github.javaguide.springsecurityjwtguide.system.web.controller;
 
-import github.javaguide.springsecurityjwtguide.security.common.utils.CurrentUserUtils;
 import github.javaguide.springsecurityjwtguide.system.service.UserService;
 import github.javaguide.springsecurityjwtguide.system.web.representation.UserRepresentation;
 import github.javaguide.springsecurityjwtguide.system.web.request.UserRegisterRequest;
@@ -30,7 +29,6 @@ import javax.validation.Valid;
 public class UserController {
 
     private final UserService userService;
-    private final CurrentUserUtils currentUserUtils;
 
     @PostMapping("/sign-up")
     public ResponseEntity<Void> signUp(@RequestBody @Valid UserRegisterRequest userRegisterRequest) {

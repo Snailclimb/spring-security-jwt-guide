@@ -42,14 +42,14 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             return;
         }
         String tokenValue = token.replace(SecurityConstants.TOKEN_PREFIX, "");
-        String previousToken = stringRedisTemplate.opsForValue().get(JwtTokenUtils.getId(tokenValue));
-        if (!token.equals(previousToken)) {
-            SecurityContextHolder.clearContext();
-            chain.doFilter(request, response);
-            return;
-        }
         UsernamePasswordAuthenticationToken authentication = null;
         try {
+            String previousToken = stringRedisTemplate.opsForValue().get(JwtTokenUtils.getId(tokenValue));
+            if (!token.equals(previousToken)) {
+                SecurityContextHolder.clearContext();
+                chain.doFilter(request, response);
+                return;
+            }
             authentication = JwtTokenUtils.getAuthentication(tokenValue);
         } catch (JwtException e) {
             logger.error("Invalid jwt : " + e.getMessage());
