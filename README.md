@@ -3,28 +3,6 @@
 
 **如果国内访问缓慢的话，可以通过码云查看：** https://gitee.com/SnailClimb/spring-security-jwt-guide 。
 
-
-## 目录
-
-
-- [相关文档](#相关文档)
-- [介绍](#介绍)
-- [你能学习到什么](#你能学习到什么)
-- [项目概览](#项目概览)
-- [如何运行项目](#如何运行项目)
-- [示例](#示例)
-    - [1.注册一个账号](#1注册一个账号)
-    - [2.登录](#2登录)
-    - [3.使用正确 Token 访问需要进行身份验证的资源](#3使用正确-token-访问需要进行身份验证的资源)
-    - [4.不带 Token 或者使用无效 Token 访问](#4不带-token-或者使用无效-token-访问)
-    - [5.带了正确Token但是访问权限](#5带了正确token但是访问权限)
-- [代办](#代办)
-- [参考](#参考)
-
-## 相关文档
-
-- [项目讲解/分析](./docs/SpringSecurity介绍.md)
-
 ## 前言
 
 [Spring Security](https://spring.io/projects/spring-security ) 是 Spring 全家桶中非常强大的一个用来做身份验证以及权限控制的框架，我们可以轻松地扩展它来满足我们当前系统安全性这方面的需求。
@@ -50,6 +28,11 @@
 1. Spring Security +JWT 实现登入登出以及权限校验
 2. JPA 实现审计功能、多对多的映射关系如何通过关联表实现
 
+## 教程
+
+1. [项目讲解/分析](./docs/SpringSecurity介绍.md) （内容待重构）
+2. [swagger3.0整合](./docs/swagger.md) 
+
 ## 代办
 
 - [x] 增加H2内存数据库支持，无须MySQL，一键启动项目启动后访问 `http://{host}:9333/h2-console/` (数据库 url 地址、用户名和密码都在  `application.properties` 配置文件中)
@@ -74,6 +57,7 @@
 
 1. git clone https://github.com/Snailclimb/spring-security-jwt-guide.git
 2. 打开项目并且等待 Maven 下载好相关依赖。建议使用 Intellij IDEA 打开，并确保你的 Intellij IDEA 下载了 lombok 插件。
+3. 下载 redis 并`application.yaml`中redis的配置
 4. 运行项目（相关数据表会被自动创建，不了解的看一下 JPA）
 
 ## 示例
