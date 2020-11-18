@@ -3,6 +3,8 @@ package github.javaguide.springsecurityjwtguide.security.controller;
 import github.javaguide.springsecurityjwtguide.security.common.constants.SecurityConstants;
 import github.javaguide.springsecurityjwtguide.security.dto.LoginRequest;
 import github.javaguide.springsecurityjwtguide.security.service.AuthService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -20,11 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@Api(tags = "认证")
 public class AuthController {
 
     private final AuthService authService;
 
     @PostMapping("/login")
+    @ApiOperation("登录")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest) {
         String token = authService.getToken(loginRequest);
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -33,6 +37,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
+    @ApiOperation("退出")
     public ResponseEntity<Void> logout() {
         authService.deleteTokenFromRedis();
         return new ResponseEntity<>(HttpStatus.OK);
