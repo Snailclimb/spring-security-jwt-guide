@@ -8,12 +8,14 @@ import java.util.Collection;
 
 /**
  * @author shuang.kou
+ * @description JWT用户对象
  */
 public class JwtUser implements UserDetails {
 
-    private Integer id;
+    private Long id;
     private String username;
     private String password;
+    private Boolean enabled;
     private Collection<? extends GrantedAuthority> authorities;
 
     public JwtUser() {
@@ -24,8 +26,9 @@ public class JwtUser implements UserDetails {
      */
     public JwtUser(User user) {
         id = user.getId();
-        username = user.getUsername();
+        username = user.getUserName();
         password = user.getPassword();
+        enabled = user.getEnabled() == null ? true : user.getEnabled();
         authorities = user.getRoles();
     }
 
@@ -61,7 +64,7 @@ public class JwtUser implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.enabled;
     }
 
     @Override

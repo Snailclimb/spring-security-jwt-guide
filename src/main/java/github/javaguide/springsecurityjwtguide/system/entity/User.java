@@ -1,52 +1,62 @@
 package github.javaguide.springsecurityjwtguide.system.entity;
 
-import github.javaguide.springsecurityjwtguide.system.enums.UserStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import github.javaguide.springsecurityjwtguide.system.web.representation.UserRepresentation;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author shuang.kou
  */
-@Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Entity
 @Table(name = "user")
-public class User {
+public class User extends AbstractAuditBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
-
-    @Column(name = "username")
-    private String username;
-
-    @Column(name = "password")
+    private Long id;
+    @Column(nullable = false)
+    private String userName;
+    @Column(nullable = false)
+    private String fullName;
+    @Column(nullable = false)
     private String password;
+    @Column(columnDefinition = "tinyint(1) default 1")
+    private Boolean enabled;
 
-    @Column(name = "status")
-    @Enumerated(value = EnumType.STRING)
-    private UserStatus status;
-
-    @Column(name = "role")
-    private String roles;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<UserRole> userRoles = new ArrayList<>();
 
     public List<SimpleGrantedAuthority> getRoles() {
+        List<Role> roles = userRoles.stream().map(UserRole::getRole).collect(Collectors.toList());
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        Arrays.stream(roles.split(",")).forEach(role ->
-                authorities.add(new SimpleGrantedAuthority("ROLE_" + role)));
+        roles.forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName())));
         return authorities;
+    }
+
+    public UserRepresentation toUserRepresentation() {
+        return UserRepresentation.builder().fullName(this.fullName)
+                .userName(this.userName).build();
     }
 
 }
