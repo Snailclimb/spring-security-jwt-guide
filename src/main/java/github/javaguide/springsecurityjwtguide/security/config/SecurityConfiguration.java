@@ -1,5 +1,6 @@
 package github.javaguide.springsecurityjwtguide.security.config;
 
+import github.javaguide.springsecurityjwtguide.security.common.constants.SecurityConstants;
 import github.javaguide.springsecurityjwtguide.security.exception.JwtAccessDeniedHandler;
 import github.javaguide.springsecurityjwtguide.security.exception.JwtAuthenticationEntryPoint;
 import github.javaguide.springsecurityjwtguide.security.filter.JwtAuthorizationFilter;
@@ -12,23 +13,24 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
+
+import static java.util.Collections.singletonList;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
- * @author shuang.kou
+ * @author shuang.kou Saving
+ * @date 2020.11.28 14:16
  * @description Spring Security配置类
- */
+ * @version 1.1
+ **/
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-    private static final String[] SWAGGER_WHITELIST = {
-            "/swagger-ui.html",
-            "/swagger-ui/*",
-            "/swagger-resources/**",
-            "/v2/api-docs",
-            "/v3/api-docs",
-            "/webjars/**"
-    };
 
     private final StringRedisTemplate stringRedisTemplate;
 
@@ -47,17 +49,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and()
+        http.cors(withDefaults())
                 // 禁用 CSRF
                 .csrf().disable()
                 .authorizeRequests()
                 // swagger
-                .antMatchers(SWAGGER_WHITELIST).permitAll()
+                .antMatchers(SecurityConstants.SWAGGER_WHITELIST).permitAll()
                 // 登录接口
-                .antMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                .antMatchers(HttpMethod.POST, SecurityConstants.LOGIN_WHITELIST).permitAll()
                 // 指定路径下的资源需要验证了的用户才能访问
-                .antMatchers("/api/**").authenticated()
-                .antMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
+                .antMatchers(SecurityConstants.FILTER_ALL).authenticated()
+                .antMatchers(HttpMethod.DELETE, SecurityConstants.FILTER_ALL).hasRole("ADMIN")
                 // 其他都放行了
                 .anyRequest().permitAll()
                 .and()
@@ -70,6 +72,24 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler(new JwtAccessDeniedHandler());
         // 防止H2 web 页面的Frame 被拦截
         http.headers().frameOptions().disable();
+    }
+
+    /**
+     * Cors配置优化
+     **/
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        org.springframework.web.cors.CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(singletonList("*"));
+        // configuration.setAllowedOriginPatterns(singletonList("*"));
+        configuration.setAllowedHeaders(singletonList("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "OPTIONS"));
+        configuration.setExposedHeaders(singletonList(SecurityConstants.TOKEN_HEADER));
+        configuration.setAllowCredentials(false);
+        configuration.setMaxAge(3600l);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
 }
