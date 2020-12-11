@@ -1,14 +1,16 @@
-## Swagger 介绍
+> 可选标题：试试？ Swagger官方 Starter 配上这个增强方案。真的香！
 
-Swagger 是一套基于 OpenAPI 规范构建的开源工具，可以帮助我们设计、构建、记录以及使用 Rest API。
+**何为 Swagger ？** 简单来说，Swagger 就是一套基于 OpenAPI 规范构建的开源工具，可以帮助我们设计、构建、记录以及使用 Rest API。
 
-## 为什么要用 Swagger?
+**为何要用 Swagger ?** 前后端分离的情况下，一份Rest API 文档将会极大的提高我们的工作效率。前端小伙伴只需要对照着 Rest API 文档就可以搞清楚一个接口需要的参数以及返回值。通过 Swagger 我们只需要少量注解即可生成一份自带 UI 界面的 Rest API 文档，不需要我们后端手动编写。并且，通过 UI 界面，我们还可以直接对相应的 API 进行调试,省去了准备复杂的调用参数的过程。
 
-前后端分离的情况下，一份Rest API 文档将会极大的提高我们的工作效率。前端小伙伴只需要对照着 Rest API 文档就可以搞清楚一个接口需要的参数以及返回值。
+这篇文章，我就简单给大家聊聊项目必备的 Swagger 该怎么玩。
 
-通过 Swagger 我们只需要少量注解即可生成一份自带 UI 界面的 Rest API 文档，不需要我们后端手动编写。
+这篇文章的主要内容：
 
-并且，通过 UI 界面，我们还可以直接对相应的 API 进行调试,省去了准备复杂的调用参数的过程。
+1. SpringBoot项目中如何使用？
+2. Spring Security项目中如何使用？
+3. 使用 knife4j 增强 Swagger
 
 ## SpringBoot项目中如何使用？
 
@@ -26,8 +28,6 @@ Swagger3.0官方已经有了自己的 Spring Boot Starter，只需要添加一�
 什么都不用配置！直接在浏览器中访问 :[http://ip:port/swagger-ui/](http://ip:port/swagger-ui/) 即可。
 
 ![](../pictures/swagger/swagger在SpringBoot中简单使用.png)
-
-
 
 ## Spring Security项目中如何使用？
 
@@ -170,3 +170,44 @@ public class SwaggerConfig {
 }
 ```
 
+## 使用 knife4j 增强 Swagger
+
+根据官网介绍，knife4j是为Java MVC框架集成Swagger生成Api文档的增强解决方案。
+
+项目地址：[https://gitee.com/xiaoym/knife4j](https://gitee.com/xiaoym/knife4j) 。
+
+使用方式非常简单,添加到相关依赖即可（SpringBoot版本2.3.6.RELEASE，Swagger）。
+
+```xml
+<dependency>
+    <groupId>com.github.xiaoymin</groupId>
+    <artifactId>knife4j-spring-boot-starter</artifactId>
+    <version>3.0.2</version>
+</dependency>
+```
+
+完成之后，访问：[http://ip:port/doc.html](http://ip:port/doc.html) 即可。
+
+效果如下。可以看出，相比于 swagger 原生 ui 确实好看实用了很多。
+
+![](https://cdn.jsdelivr.net/gh/javaguide-tech/blog-images-6@main/12-08-1/image-20201211214120861.png)
+
+除了 UI 上的增强之外，knife4j 还提供了一些开箱即用的功能。
+
+比如：**搜索API接口** （`knife4j` 版本>2.0.1 ）
+
+![image-20201211214620338](https://cdn.jsdelivr.net/gh/javaguide-tech/blog-images-6@main/12-08-1/image-20201211214620338.png)
+
+再比如：**导出离线文档**
+
+通过 `Knife4j` 我们可以非常方便地导出 Swagger文档 ，并且支持多种格式。
+
+> - markdown：导出当前逻辑分组下所有接口的Markdown格式的文档
+> - Html：导出当前逻辑分组下所有接口的Html格式的文档
+> - Word:导出当前逻辑分组下所有接口的Word格式的文档(自2.0.5版本开始)
+> - OpenAPI:导出当前逻辑分组下的原始OpenAPI的规范json结构(自2.0.6版本开始)
+> - PDF:未实现
+
+以 HTML 格式导出的效果图如下。
+
+![](https://cdn.jsdelivr.net/gh/javaguide-tech/blog-images-6@main/12-08-1/image-20201211215552314.png)
