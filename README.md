@@ -21,7 +21,7 @@
 - **缓存**： Redis
 - **权限框架** ：Spring Security
 - **ORM框架** ：JPA （低SQL）
-- **接口文档** ：  swagger。在线 API 文档地址：[http://localhost:9333/api/swagger-ui/](http://localhost:9333/api/swagger-ui/) 。
+- **接口文档** ：  swagger。在线 API 文档地址：[http://localhost:9333/api/swagger-ui/](http://localhost:9333/api/swagger-ui/) 。目前使用 knife4j 增强了 swagger 功能，地址： [http://localhost:9333/api/doc.html#/home](http://localhost:9333/api/doc.html#/home) （推荐👍）
 
 **你能从这个项目中学习到什么？**
 
