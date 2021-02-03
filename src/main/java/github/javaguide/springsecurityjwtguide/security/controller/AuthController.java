@@ -30,7 +30,7 @@ public class AuthController {
     @PostMapping("/login")
     @ApiOperation("登录")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest) {
-        String token = authService.getToken(loginRequest);
+        String token = authService.createToken(loginRequest);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set(SecurityConstants.TOKEN_HEADER, token);
         return new ResponseEntity<>(httpHeaders, HttpStatus.OK);
@@ -39,7 +39,7 @@ public class AuthController {
     @PostMapping("/logout")
     @ApiOperation("退出")
     public ResponseEntity<Void> logout() {
-        authService.deleteTokenFromRedis();
+        authService.removeToken();
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

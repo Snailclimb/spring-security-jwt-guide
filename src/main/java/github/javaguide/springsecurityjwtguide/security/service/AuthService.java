@@ -26,14 +26,14 @@ public class AuthService {
     private final StringRedisTemplate stringRedisTemplate;
     private final CurrentUserUtils currentUserUtils;
 
-    public String getToken(LoginRequest loginRequest) {
+    public String createToken(LoginRequest loginRequest) {
         User user = userService.find(loginRequest.getUsername());
         if (!userService.check(loginRequest.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("The user name or password is not correct.");
         }
         JwtUser jwtUser = new JwtUser(user);
         if (!jwtUser.isEnabled()) {
-            throw new BadCredentialsException("User is forbidden to log in");
+            throw new BadCredentialsException("User is forbidden to login");
         }
         List<String> authorities = jwtUser.getAuthorities()
                 .stream()
@@ -44,7 +44,7 @@ public class AuthService {
         return token;
     }
 
-    public void deleteTokenFromRedis() {
+    public void removeToken() {
         stringRedisTemplate.delete(currentUserUtils.getCurrentUser().getId().toString());
     }
 }
