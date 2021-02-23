@@ -41,11 +41,11 @@ public final class SecurityConstants {
             "/webjars/**"
     };
 
-    // 登录接口 WHITELIST
-    public static final String LOGIN_WHITELIST = "/api/auth/login";
-
-    // 过滤ALL
-    public static final String FILTER_ALL = "/api/**";
+    // System WHITELIST
+    public static final String[] SYSTEM_WHITELIST = {
+            "/auth/login",
+            "/users/sign-up"
+    };
 
     private SecurityConstants() {
     }
