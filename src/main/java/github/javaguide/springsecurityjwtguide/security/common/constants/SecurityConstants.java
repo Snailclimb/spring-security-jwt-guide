@@ -38,8 +38,12 @@ public final class SecurityConstants {
             "/swagger-resources/**",
             "/v2/api-docs",
             "/v3/api-docs",
-            "/webjars/**"
+            "/webjars/**",
+            //knife4j
+            "/doc.html",
     };
+
+    public static final String H2_CONSOLE = "/h2-console/**";
 
     // System WHITELIST
     public static final String[] SYSTEM_WHITELIST = {

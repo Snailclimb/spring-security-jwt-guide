@@ -24,9 +24,9 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * @author shuang.kou Saving
+ * @version 1.1
  * @date 2020.11.28 14:16
  * @description Spring Security配置类
- * @version 1.1
  **/
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -56,6 +56,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 // 指定的接口直接放行
                 // swagger
                 .antMatchers(SecurityConstants.SWAGGER_WHITELIST).permitAll()
+                .antMatchers(SecurityConstants.H2_CONSOLE).permitAll()
                 .antMatchers(HttpMethod.POST, SecurityConstants.SYSTEM_WHITELIST).permitAll()
                 // 其他的接口都需要认证后才能请求
                 .anyRequest().authenticated()

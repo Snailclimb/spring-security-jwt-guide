@@ -21,7 +21,7 @@
 - **缓存**： Redis
 - **权限框架** ：Spring Security
 - **ORM框架** ：JPA （低SQL）
-- **接口文档** ：  swagger。在线 API 文档地址：[http://localhost:9333/api/swagger-ui/](http://localhost:9333/api/swagger-ui/) 。目前使用 knife4j 增强了 swagger 功能，地址： [http://localhost:9333/api/doc.html#/home](http://localhost:9333/api/doc.html#/home) （推荐👍）
+- **接口文档** ：  swagger。在线 API 文档地址：[http://localhost:9333/api/swagger-ui/](http://localhost:9333/api/swagger-ui/) 。目前使用 knife4j 增强了 swagger 功能，地址： [http://localhost:9333/api/doc.html](http://localhost:9333/api/doc.html) （推荐👍）
 
 **你能从这个项目中学习到什么？**
 
@@ -35,7 +35,7 @@
 
 ## 代办
 
-- [x] 增加H2内存数据库支持，无须MySQL，一键启动项目启动后访问 [http://localhost:9333/api/h2-console](http://localhost:9333/api/h2-console )  (用户名:root,密码:123456)
+- [x] 增加H2内存数据库支持，无须MySQL，一键启动项目启动后访问 [http://localhost:9333/api/h2-console](http://localhost:9333/api/h2-console)  (用户名:root,密码:123456)
 - [x] 增加Swagger，方便调用接口
 - [x] 异常处理部分代码重构，优化返回结构
 - [x] 新建一个role表，然后通过新建一个role_user表的形式，将用户与角色关联起来
