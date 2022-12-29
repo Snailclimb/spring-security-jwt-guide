@@ -43,3 +43,6 @@ spring:
         max-idle: 8
         # 连接池中的最小空闲连接 默认 0
         min-idle: 0
+
+redis:
+  cache-switch: false

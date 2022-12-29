@@ -4,6 +4,8 @@ import github.javaguide.springsecurityjwtguide.security.common.constants.Securit
 import github.javaguide.springsecurityjwtguide.security.common.utils.JwtTokenUtils;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author shuang.kou
@@ -25,9 +28,17 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private final StringRedisTemplate stringRedisTemplate;
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, StringRedisTemplate stringRedisTemplate) {
+    private final Map<String, String> cacheMap;
+
+    private Boolean redisCacheSwitch;
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager,
+                                  StringRedisTemplate stringRedisTemplate,
+                                  Map<String, String> cacheMap,
+                                  Boolean redisCacheSwitch) {
         super(authenticationManager);
         this.stringRedisTemplate = stringRedisTemplate;
+        this.cacheMap = cacheMap;
+        this.redisCacheSwitch = redisCacheSwitch;
     }
 
     @Override
@@ -44,7 +55,13 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String tokenValue = token.replace(SecurityConstants.TOKEN_PREFIX, "");
         UsernamePasswordAuthenticationToken authentication = null;
         try {
-            String previousToken = stringRedisTemplate.opsForValue().get(JwtTokenUtils.getId(tokenValue));
+            String previousToken = "";
+            if (redisCacheSwitch) {
+                previousToken = stringRedisTemplate.opsForValue().get(JwtTokenUtils.getId(tokenValue));
+            }else {
+                previousToken = cacheMap.get(JwtTokenUtils.getId(tokenValue));
+            }
+
             if (!token.equals(previousToken)) {
                 SecurityContextHolder.clearContext();
                 chain.doFilter(request, response);
