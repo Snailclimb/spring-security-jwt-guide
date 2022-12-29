@@ -4,6 +4,8 @@ import github.javaguide.springsecurityjwtguide.security.common.constants.Securit
 import github.javaguide.springsecurityjwtguide.security.exception.JwtAccessDeniedHandler;
 import github.javaguide.springsecurityjwtguide.security.exception.JwtAuthenticationEntryPoint;
 import github.javaguide.springsecurityjwtguide.security.filter.JwtAuthorizationFilter;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpMethod;
@@ -18,6 +20,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import static java.util.Collections.singletonList;
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -34,8 +37,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final StringRedisTemplate stringRedisTemplate;
 
-    public SecurityConfiguration(StringRedisTemplate stringRedisTemplate) {
+    private final Map<String, String> cacheMap;
+
+    private Boolean redisCacheSwitch;
+    public SecurityConfiguration(StringRedisTemplate stringRedisTemplate, @Qualifier(value = "cacheMap") Map<String, String> cacheMap, @Value("${redis.cache-switch}") Boolean redisCacheSwitch) {
         this.stringRedisTemplate = stringRedisTemplate;
+        this.cacheMap = cacheMap;
+        this.redisCacheSwitch = redisCacheSwitch;
     }
 
     /**
@@ -62,7 +70,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 //添加自定义Filter
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), stringRedisTemplate))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), stringRedisTemplate, cacheMap, redisCacheSwitch))
                 // 不需要session（不创建会话）
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 // 授权异常处理
