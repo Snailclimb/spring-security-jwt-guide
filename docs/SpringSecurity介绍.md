@@ -43,18 +43,21 @@ Spring Security 应该属于 Spring 全家桶中学习曲线比较陡峭的几�
 配置类中我们主要配置了：
 
 1. 密码编码器 `BCryptPasswordEncoder`（存入数据库的密码需要被加密）。
-2. 为` AuthenticationManager` 设置自定义的 `UserDetailsService`以及密码编码器；
-3. 在 Spring Security 配置指定了哪些路径下的资源需要验证了的用户才能访问、哪些不需要以及哪些资源只能被特定角色访问；
-4. 将我们自定义的两个过滤器添加到 Spring Security 配置中；
-5. 将两个自定义处理权限认证方面的异常类添加到 Spring Security 配置中；
+2. 在 Spring Security 配置指定了哪些路径下的资源需要验证了的用户才能访问、哪些不需要以及哪些资源只能被特定角色访问；
+3. 将我们自定义的过滤器添加到 Spring Security 配置中；
+4. 将两个自定义处理权限认证方面的异常类添加到 Spring Security 配置中；
+5. 对跨域请求`Cors`的配置优化（在这里踩的一个坑是：如果你没有设置`exposedHeaders("Authorization")`暴露 header 中的"Authorization"属性给客户端应用程序的话，前端是获取不到 token 信息的。）
 
 ```java
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    UserDetailsServiceImpl userDetailsServiceImpl;
+    private final StringRedisTemplate stringRedisTemplate;
+
+    public SecurityConfiguration(StringRedisTemplate stringRedisTemplate) {
+        this.stringRedisTemplate = stringRedisTemplate;
+    }
 
     /**
      * 密码编码器
@@ -64,65 +67,54 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public UserDetailsService createUserDetailsService() {
-        return userDetailsServiceImpl;
-    }
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        // 设置自定义的userDetailsService以及密码编码器
-        auth.userDetailsService(userDetailsServiceImpl).passwordEncoder(bCryptPasswordEncoder());
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and()
+        http.cors(withDefaults())
                 // 禁用 CSRF
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                // 指定路径下的资源需要验证了的用户才能访问
-                .antMatchers("/api/**").authenticated()
-                .antMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
-                // 其他都放行了
-                .anyRequest().permitAll()
+                // 指定的接口直接放行
+                // swagger
+                .antMatchers(SecurityConstants.SWAGGER_WHITELIST).permitAll()
+                .antMatchers(SecurityConstants.H2_CONSOLE).permitAll()
+                .antMatchers(HttpMethod.POST, SecurityConstants.SYSTEM_WHITELIST).permitAll()
+                // 其他的接口都需要认证后才能请求
+                .anyRequest().authenticated()
                 .and()
                 //添加自定义Filter
-                .addFilter(new JWTAuthenticationFilter(authenticationManager()))
-                .addFilter(new JWTAuthorizationFilter(authenticationManager()))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), stringRedisTemplate))
                 // 不需要session（不创建会话）
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 // 授权异常处理
-                .exceptionHandling().authenticationEntryPoint(new JWTAuthenticationEntryPoint())
-                .accessDeniedHandler(new JWTAccessDeniedHandler());
+                .exceptionHandling().authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                .accessDeniedHandler(new JwtAccessDeniedHandler());
+        // 防止H2 web 页面的Frame 被拦截
+        http.headers().frameOptions().disable();
+    }
 
+    /**
+     * Cors配置优化
+     **/
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        org.springframework.web.cors.CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(singletonList("*"));
+        // configuration.setAllowedOriginPatterns(singletonList("*"));
+        configuration.setAllowedHeaders(singletonList("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "OPTIONS"));
+        //暴露header中的其他属性给客户端应用程序
+        //如果不设置这个属性前端无法通过response header获取到Authorization也就是token
+        configuration.setExposedHeaders(singletonList(SecurityConstants.TOKEN_HEADER));
+        configuration.setAllowCredentials(false);
+        configuration.setMaxAge(3600L);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
 }
 
-```
-
-**跨域：**
-
-在这里踩的一个坑是:如果你没有设置`exposedHeaders("Authorization")`暴露 header 中的"Authorization"属性给客户端应用程序的话，前端是获取不到 token 信息的。
-
-```java
-@Configuration
-public class CorsConfiguration implements WebMvcConfigurer {
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")
-                //暴露header中的其他属性给客户端应用程序
-                //如果不设置这个属性前端无法通过response header获取到Authorization也就是token
-                .exposedHeaders("Authorization")
-                .allowCredentials(true)
-                .allowedMethods("GET", "POST", "DELETE", "PUT")
-                .maxAge(3600);
-    }
-}
 ```
 
 ### 工具类
@@ -130,6 +122,7 @@ public class CorsConfiguration implements WebMvcConfigurer {
 ```java
 /**
  * @author shuang.kou
+ * @description JWT工具类
  */
 public class JwtTokenUtils {
 
@@ -137,218 +130,82 @@ public class JwtTokenUtils {
     /**
      * 生成足够的安全随机密钥，以适合符合规范的签名
      */
-    private static byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(SecurityConstants.JWT_SECRET_KEY);
-    private static SecretKey secretKey = Keys.hmacShaKeyFor(apiKeySecretBytes);
+    private static final byte[] API_KEY_SECRET_BYTES = DatatypeConverter.parseBase64Binary(SecurityConstants.JWT_SECRET_KEY);
+    private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(API_KEY_SECRET_BYTES);
 
-    public static String createToken(String username, List<String> roles, boolean isRememberMe) {
+    public static String createToken(String username, String id, List<String> roles, boolean isRememberMe) {
         long expiration = isRememberMe ? SecurityConstants.EXPIRATION_REMEMBER : SecurityConstants.EXPIRATION;
-
+        final Date createdDate = new Date();
+        final Date expirationDate = new Date(createdDate.getTime() + expiration * 1000);
         String tokenPrefix = Jwts.builder()
-                .setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)
-                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .setHeaderParam("type", SecurityConstants.TOKEN_TYPE)
+                .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
                 .claim(SecurityConstants.ROLE_CLAIMS, String.join(",", roles))
+                .setId(id)
                 .setIssuer("SnailClimb")
-                .setIssuedAt(new Date())
+                .setIssuedAt(createdDate)
                 .setSubject(username)
-                .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
+                .setExpiration(expirationDate)
                 .compact();
-        return SecurityConstants.TOKEN_PREFIX + tokenPrefix;
+        return SecurityConstants.TOKEN_PREFIX + tokenPrefix; // 添加 token 前缀 "Bearer ";
     }
 
-    private boolean isTokenExpired(String token) {
-        Date expiredDate = getTokenBody(token).getExpiration();
-        return expiredDate.before(new Date());
+    public static String getId(String token) {
+        Claims claims = getClaims(token);
+        return claims.getId();
     }
 
-    public static String getUsernameByToken(String token) {
-        return getTokenBody(token).getSubject();
+    public static UsernamePasswordAuthenticationToken getAuthentication(String token) {
+        Claims claims = getClaims(token);
+        List<SimpleGrantedAuthority> authorities = getAuthorities(claims);
+        String userName = claims.getSubject();
+        return new UsernamePasswordAuthenticationToken(userName, token, authorities);
     }
 
     /**
      * 获取用户所有角色
      */
-    public static List<SimpleGrantedAuthority> getUserRolesByToken(String token) {
-        String role = (String) getTokenBody(token)
-                .get(SecurityConstants.ROLE_CLAIMS);
+    private static List<SimpleGrantedAuthority> getAuthorities(Claims claims) {
+        String role = (String) claims.get(SecurityConstants.ROLE_CLAIMS);
         return Arrays.stream(role.split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }
 
-    private static Claims getTokenBody(String token) {
+    private static Claims getClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(secretKey)
+                .setSigningKey(SECRET_KEY)
                 .parseClaimsJws(token)
                 .getBody();
     }
-}
-```
 
-
-
-###  获取保存在服务端的用户信息类
-
-Spring Security 提供的 `UserDetailsService`有一个通过名字返回 Spring Security 可用于身份验证的`UserDetails`对象的方法：`loadUserByUsername()`。
-
-```java
-package org.springframework.security.core.userdetails;
-/**
- *加载用户特定数据的核心接口。
- */
-public interface UserDetailsService {
-	UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
-}
-```
-
-`UserDetails`包含用于构建认证对象的必要信息（例如：用户名，密码）。
-
-```java
-package org.springframework.security.core.userdetails;
-/**
- *提供用户核心信息的借口
- */
-public interface UserDetails extends Serializable {
-  Collection<? extends GrantedAuthority> getAuthorities();
-  String getPassword();
-  String getUsername();
-  boolean isAccountNonExpired();
-  boolean isAccountNonLocked();
-  boolean isCredentialsNonExpired();
-  boolean isEnabled();
-}
-```
-
-一般情况下我们需要实现 `UserDetailsService` 借口并重写其中的 `loadUserByUsername()` 方法。
-
-```java
-@Service
-public class UserDetailsServiceImpl implements UserDetailsService {
-
-    private final UserService userService;
-
-    public UserDetailsServiceImpl(UserService userService) {
-        this.userService = userService;
-    }
-    @Override
-    public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
-        User user = userService.findUserByUserName(name);
-        return new JwtUser(user);
-    }
-
-}
-```
-
-### 认证过滤器（重要）
-
-> 建议看下面的过滤器介绍之前先了解一下过滤器的基础知识，以及如何在 Spring Boot 中实现过滤器。推荐阅读这篇文章：[SpringBoot 实现过滤器](https://github.com/Snailclimb/springboot-guide/blob/master/docs/basis/springboot-filter.md)
-
-第一个过滤器主要`JWTAuthenticationFilter`用于根据用户的用户名和密码进行登录验证(用户请求中必须有用户名和密码这两个参数)，为此我们继承了 `UsernamePasswordAuthenticationFilter` 并且重写了下面三个方法：
-
-1. `attemptAuthentication（）`: 验证用户身份。
-2. `successfulAuthentication()` ： 用户身份验证成功后调用的方法。
-3. `unsuccessfulAuthentication()`： 用户身份验证失败后调用的方法。
-
-```java
-/**
- * @author shuang.kou
- * 如果用户名和密码正确，那么过滤器将创建一个JWT Token 并在HTTP Response 的header中返回它，格式：token: "Bearer +具体token值"
- */
-public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-
-    private ThreadLocal<Boolean> rememberMe = new ThreadLocal<>();
-    private AuthenticationManager authenticationManager;
-
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-        // 设置登录请求的 URL
-        super.setFilterProcessesUrl(SecurityConstants.AUTH_LOGIN_URL);
-    }
-
-    @Override
-    public Authentication attemptAuthentication(HttpServletRequest request,
-                                                HttpServletResponse response) throws AuthenticationException {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            // 从输入流中获取到登录的信息
-            LoginUser loginRequest = objectMapper.readValue(request.getInputStream(), LoginUser.class);
-            rememberMe.set(loginRequest.getRememberMe());
-            // 这部分和attemptAuthentication方法中的源码是一样的，
-            // 只不过由于这个方法源码的是把用户名和密码这些参数的名字是死的，所以我们重写了一下
-            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
-                    loginRequest.getUsername(), loginRequest.getPassword());
-            return authenticationManager.authenticate(authRequest);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * 如果验证成功，就生成token并返回
-     */
-    @Override
-    protected void successfulAuthentication(HttpServletRequest request,
-                                            HttpServletResponse response,
-                                            FilterChain chain,
-                                            Authentication authentication) {
-
-        JwtUser jwtUser = (JwtUser) authentication.getPrincipal();
-        List<String> roles = jwtUser.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
-        // 创建 Token
-        String token = JwtTokenUtils.createToken(jwtUser.getUsername(), roles, rememberMe.get());
-        // Http Response Header 中返回 Token
-        response.setHeader(SecurityConstants.TOKEN_HEADER, token);
-    }
-
-
-    @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException authenticationException) throws IOException {
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authenticationException.getMessage());
-    }
-}
-```
-
-这个过滤器中有几个比较重要的地方说明：
-
-1. `UsernamePasswordAuthenticationToken`:从登录请求中获取{用户名，密码}，`AuthenticationManager`将使用它来认证登录帐户。
-2. `authenticationManager.authenticate(authRequest)`:这段代码主要对用户进行认证，当执行这段代码的时候会跳到`UserDetailsServiceImpl`中去调用`loadUserByUsername()`方法来验证（我们在配置类中配置了`AuthenticationManager`使用自定义的`UserDetailsServiceImpl`去验证用户信息）。当验证成功后会返回一个完整填充的`Authentication`对象(包括授予的权限)，然后会去调用`successfulAuthentication`方法。
-
-```java
-package org.springframework.security.authentication;
- /**
-  *尝试验证Authentication对象，如果成功，将返回一个完整填充的Authentication对象(包括授予的权限)。
-  */
-public interface AuthenticationManager {
-	Authentication authenticate(Authentication authentication)
-			throws AuthenticationException;
 }
 ```
 
 ### 授权过滤器（重要）
+
+> 建议看下面的过滤器介绍之前先了解一下过滤器的基础知识，以及如何在 Spring Boot 中实现过滤器。推荐阅读这篇文章：[SpringBoot 实现过滤器](https://github.com/Snailclimb/springboot-guide/blob/master/docs/basis/springboot-filter.md)
 
 这个过滤器继承了 `BasicAuthenticationFilter`，主要用于处理身份认证后才能访问的资源，它会检查 HTTP 请求是否存在带有正确令牌的 Authorization 标头并验证 token 的有效性。
 
 当用户使用 token 对需要权限才能访问的资源进行访问的时候，这个类是主要用到的，下面按照步骤来说一说每一步到底都做了什么。
 
 1. 当用户使用系统返回的 token 信息进行登录的时候 ，会首先经过`doFilterInternal（）`方法，这个方法会从请求的Header中取出 token 信息，然后判断 token 信息是否为空以及 token 信息格式是否正确。
-2. 如果请求头中有token 并且 token 的格式正确，则进行解析并判断 token 的有效性，然后会在 Spring  Security 全局设置授权信息`SecurityContextHolder.getContext().setAuthentication(getAuthentication(authorization));`
+2. 如果请求头中有token 并且 token 的格式正确，则进行解析并判断 token 的有效性，然后会在 Spring  Security 全局设置授权信息`SecurityContextHolder.getContext().setAuthentication(authorization);`
 
 ```java
 /**
- * 过滤器处理所有HTTP请求，并检查是否存在带有正确令牌的Authorization标头。例如，如果令牌未过期或签名密钥正确。
- *
  * @author shuang.kou
+ * @description 过滤器处理所有HTTP请求，并检查是否存在带有正确令牌的Authorization标头。例如，如果令牌未过期或签名密钥正确。
  */
-public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
+@Slf4j
+public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
-    private static final Logger logger = Logger.getLogger(JWTAuthorizationFilter.class.getName());
+    private final StringRedisTemplate stringRedisTemplate;
 
-    public JWTAuthorizationFilter(AuthenticationManager authenticationManager) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, StringRedisTemplate stringRedisTemplate) {
         super(authenticationManager);
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     @Override
@@ -356,34 +213,31 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
 
-        String authorization = request.getHeader(SecurityConstants.TOKEN_HEADER);
+        String token = request.getHeader(SecurityConstants.TOKEN_HEADER);
         // 如果请求头中没有Authorization信息则直接放行了
-        if (authorization == null || !authorization.startsWith(SecurityConstants.TOKEN_PREFIX)) {
+        if (token == null || !token.startsWith(SecurityConstants.TOKEN_PREFIX)) {
+            SecurityContextHolder.clearContext();
             chain.doFilter(request, response);
             return;
         }
-        // 如果请求头中有token，则进行解析，并且设置授权信息
-        SecurityContextHolder.getContext().setAuthentication(getAuthentication(authorization));
-        super.doFilterInternal(request, response, chain);
-    }
-
-    /**
-     * 这里从token中获取用户信息并新建一个token
-     */
-    private UsernamePasswordAuthenticationToken getAuthentication(String authorization) {
-        String token = authorization.replace(SecurityConstants.TOKEN_PREFIX, "");
-
+        // 如果请求头中有token，则进行解析
+        String tokenValue = token.replace(SecurityConstants.TOKEN_PREFIX, "");
+        UsernamePasswordAuthenticationToken authentication = null;
         try {
-            String username = JwtTokenUtils.getUsernameByToken(token);
-            // 通过 token 获取用户具有的角色
-            List<SimpleGrantedAuthority> userRolesByToken = JwtTokenUtils.getUserRolesByToken(token);
-            if (!StringUtils.isEmpty(username)) {
-                return new UsernamePasswordAuthenticationToken(username, null, userRolesByToken);
+            String previousToken = stringRedisTemplate.opsForValue().get(JwtTokenUtils.getId(tokenValue));
+            // 如果请求头中的token与redis中存储的之前的token不同则直接放行
+            if (!token.equals(previousToken)) {
+                SecurityContextHolder.clearContext();
+                chain.doFilter(request, response);
+                return;
             }
-        } catch (SignatureException | ExpiredJwtException exception) {
-            logger.warning("Request to parse JWT with invalid signature . Detail : " + exception.getMessage());
+            // 设置授权信息
+            authentication = JwtTokenUtils.getAuthentication(tokenValue);
+        } catch (JwtException e) {
+            logger.error("Invalid jwt : " + e.getMessage());
         }
-        return null;
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        chain.doFilter(request, response);
     }
 }
 ```
@@ -399,26 +253,19 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 ```java
 /**
  * @author shuang.kou
- * 获取当前请求的用户
+ * @description 获取当前请求的用户
  */
 @Component
-public class CurrentUser {
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+public class CurrentUserUtils {
 
-    private final UserDetailsServiceImpl userDetailsService;
+    private final UserService userService;
 
-    public CurrentUser(UserDetailsServiceImpl userDetailsService) {
-        this.userDetailsService = userDetailsService;
+    public User getCurrentUser() {
+        return userService.find(getCurrentUserName());
     }
 
-    public JwtUser getCurrentUser() {
-        return (JwtUser) userDetailsService.loadUserByUsername(getCurrentUserName());
-    }
-
-    /**
-     * TODO:由于在JWTAuthorizationFilter这个类注入UserDetailsServiceImpl一致失败，
-     * 导致无法正确查找到用户，所以存入Authentication的Principal为从 token 中取出的当前用户的姓名
-     */
-    private static String getCurrentUserName() {
+    private  String getCurrentUserName() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() != null) {
             return (String) authentication.getPrincipal();
@@ -437,12 +284,12 @@ public class CurrentUser {
 ```java
 /**
  * @author shuang.kou
- * AccessDeineHandler 用来解决认证过的用户访问需要权限才能访问的资源时的异常
+ * @description AccessDeineHandler 用来解决认证过的用户访问无权限资源时的异常
  */
-public class JWTAccessDeniedHandler implements AccessDeniedHandler {
+public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     /**
      * 当用户尝试访问需要权限才能的REST资源而权限不足的时候，
-     * 将调用此方法发送401响应以及错误信息
+     * 将调用此方法发送403响应以及错误信息
      */
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
@@ -450,7 +297,6 @@ public class JWTAccessDeniedHandler implements AccessDeniedHandler {
         response.sendError(HttpServletResponse.SC_FORBIDDEN, accessDeniedException.getMessage());
     }
 }
-
 ```
 
 #### AuthenticationEntryPoint
@@ -460,11 +306,11 @@ public class JWTAccessDeniedHandler implements AccessDeniedHandler {
 ```java
 /**
  * @author shuang.kou
- * AuthenticationEntryPoint 用来解决匿名用户访问需要权限才能访问的资源时的异常
+ * @description AuthenticationEntryPoint 用来解决匿名用户访问需要权限才能访问的资源时的异常
  */
-public class JWTAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     /**
-     * 当用户尝试访问需要权限才能的REST资源而不提供Token或者Token过期时，
+     * 当用户尝试访问需要权限才能的REST资源而不提供Token或者Token错误或者过期时，
      * 将调用此方法发送401响应以及错误信息
      */
     @Override
@@ -480,38 +326,48 @@ public class JWTAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
 这个是 `UserControler` 主要用来检测权限配置是否生效。
 
-`getAllUser（）`方法被注解` @PreAuthorize("hasAnyRole('ROLE_DEV','ROLE_PM')")`修饰代表这个方法可以被DEV，PM 这两个角色访问，而`deleteUserById()` 被注解` @PreAuthorize("hasAnyRole('ROLE_ADMIN')")`修饰代表只能被 ADMIN 访问。
+`getAllUser（）`方法被注解` @PreAuthorize("hasAnyRole('ROLE_USER','ROLE_MANAGER','ROLE_ADMIN')")`修饰代表这个方法可以被USER，MANAGER，ADMIN 这三个角色访问，而`deleteUserByUserName()` 被注解` @PreAuthorize("hasAnyRole('ROLE_ADMIN')")`修饰代表只能被 ADMIN 访问。
 
 ```java
 /**
  * @author shuang.kou
  */
 @RestController
-@RequestMapping("/api")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequestMapping("/users")
+@Api(tags = "用户")
 public class UserController {
 
     private final UserService userService;
 
-    private final CurrentUser currentUser;
-
-    public UserController(UserService userService, CurrentUser currentUser) {
-        this.userService = userService;
-        this.currentUser = currentUser;
+    @PostMapping("/sign-up")
+    @ApiOperation("用户注册")
+    public ResponseEntity<Void> signUp(@RequestBody @Valid UserRegisterRequest userRegisterRequest) {
+        userService.save(userRegisterRequest);
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/users")
-    @PreAuthorize("hasAnyRole('ROLE_DEV','ROLE_PM')")
-    public ResponseEntity<Page<User>> getAllUser(@RequestParam(value = "pageNum", defaultValue = "0") int pageNum, @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        System.out.println("当前访问该接口的用户为：" + currentUser.getCurrentUser().toString());
-        Page<User> allUser = userService.getAllUser(pageNum, pageSize);
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ROLE_USER','ROLE_MANAGER','ROLE_ADMIN')")
+    @ApiOperation("获取所有用户的信息（分页）")
+    public ResponseEntity<Page<UserRepresentation>> getAllUser(@RequestParam(value = "pageNum", defaultValue = "0") int pageNum, @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        Page<UserRepresentation> allUser = userService.getAll(pageNum, pageSize);
         return ResponseEntity.ok().body(allUser);
     }
 
-
-    @DeleteMapping("/user")
+    @PutMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<User> deleteUserById(@RequestParam("username") String username) {
-        userService.deleteUserByUserName(username);
+    @ApiOperation("更新用户")
+    public ResponseEntity<Void> update(@RequestBody @Valid UserUpdateRequest userUpdateRequest) {
+        userService.update(userUpdateRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    @ApiOperation("根据用户名删除用户")
+    public ResponseEntity<Void> deleteUserByUserName(@RequestParam("username") String username) {
+        userService.delete(username);
         return ResponseEntity.ok().build();
     }
 }

@@ -82,6 +82,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         // configuration.setAllowedOriginPatterns(singletonList("*"));
         configuration.setAllowedHeaders(singletonList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "OPTIONS"));
+        //暴露header中的其他属性给客户端应用程序
+        //如果不设置这个属性前端无法通过response header获取到Authorization也就是token
         configuration.setExposedHeaders(singletonList(SecurityConstants.TOKEN_HEADER));
         configuration.setAllowCredentials(false);
         configuration.setMaxAge(3600L);
