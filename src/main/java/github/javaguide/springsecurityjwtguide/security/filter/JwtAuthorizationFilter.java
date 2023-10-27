@@ -36,20 +36,24 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                                     FilterChain chain) throws IOException, ServletException {
 
         String token = request.getHeader(SecurityConstants.TOKEN_HEADER);
+        // 如果请求头中没有Authorization信息则直接放行了
         if (token == null || !token.startsWith(SecurityConstants.TOKEN_PREFIX)) {
             SecurityContextHolder.clearContext();
             chain.doFilter(request, response);
             return;
         }
+        // 如果请求头中有token，则进行解析
         String tokenValue = token.replace(SecurityConstants.TOKEN_PREFIX, "");
         UsernamePasswordAuthenticationToken authentication = null;
         try {
             String previousToken = stringRedisTemplate.opsForValue().get(JwtTokenUtils.getId(tokenValue));
+            // 如果请求头中的token与redis中存储的之前的token不同则直接放行
             if (!token.equals(previousToken)) {
                 SecurityContextHolder.clearContext();
                 chain.doFilter(request, response);
                 return;
             }
+            // 设置授权信息
             authentication = JwtTokenUtils.getAuthentication(tokenValue);
         } catch (JwtException e) {
             logger.error("Invalid jwt : " + e.getMessage());

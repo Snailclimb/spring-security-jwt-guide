@@ -57,6 +57,9 @@ public class JwtTokenUtils {
         return new UsernamePasswordAuthenticationToken(userName, token, authorities);
     }
 
+    /**
+     * 获取用户所有角色
+     */
     private static List<SimpleGrantedAuthority> getAuthorities(Claims claims) {
         String role = (String) claims.get(SecurityConstants.ROLE_CLAIMS);
         return Arrays.stream(role.split(","))
