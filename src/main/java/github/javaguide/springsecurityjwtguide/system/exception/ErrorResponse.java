@@ -1,45 +1,57 @@
 package github.javaguide.springsecurityjwtguide.system.exception;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import org.springframework.util.ObjectUtils;
+import java.time.LocalDateTime;
 
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-
-@Getter
-@ToString
-@NoArgsConstructor
 public class ErrorResponse {
-    private int code;
-    private int status;
     private String message;
+    private int status;
+    private LocalDateTime timestamp;
     private String path;
-    private Instant timestamp;
-    private final HashMap<String, Object> errorDetail = new HashMap<>();
 
-    public ErrorResponse(BaseException ex, String path) {
-        this(ex.getErrorCode().getCode(), ex.getErrorCode().getStatus().value(), ex.getErrorCode().getMessage(), path, ex.getData());
+    public ErrorResponse() {
+        this.timestamp = LocalDateTime.now();
     }
 
-    public ErrorResponse(ErrorCode errorCode, String path) {
-        this(errorCode.getCode(), errorCode.getStatus().value(), errorCode.getMessage(), path, null);
-    }
-
-    public ErrorResponse(ErrorCode errorCode, String path, Map<String, Object> errorDetail) {
-        this(errorCode.getCode(), errorCode.getStatus().value(), errorCode.getMessage(), path, errorDetail);
-    }
-
-    private ErrorResponse(int code, int status, String message, String path, Map<String, Object> errorDetail) {
-        this.code = code;
-        this.status = status;
+    public ErrorResponse(String message, int status) {
+        this();
         this.message = message;
+        this.status = status;
+    }
+
+    public ErrorResponse(String message, int status, String path) {
+        this(message, status);
         this.path = path;
-        this.timestamp = Instant.now();
-        if (!ObjectUtils.isEmpty(errorDetail)) {
-            this.errorDetail.putAll(errorDetail);
-        }
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }

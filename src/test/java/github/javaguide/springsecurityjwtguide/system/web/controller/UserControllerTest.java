@@ -2,7 +2,7 @@ package github.javaguide.springsecurityjwtguide.system.web.controller;
 
 import github.javaguide.springsecurityjwtguide.BaseTest;
 import github.javaguide.springsecurityjwtguide.system.web.request.UserRegisterRequest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 

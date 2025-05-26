@@ -29,3 +29,5 @@ build/
 
 ### VS Code ###
 .vscode/
+.cursorrules
+.DS_Store

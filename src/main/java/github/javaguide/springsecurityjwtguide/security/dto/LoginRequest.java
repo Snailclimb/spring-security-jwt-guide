@@ -1,17 +1,14 @@
 package github.javaguide.springsecurityjwtguide.security.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
+import lombok.Value;
 
 /**
  * @author shuang.kou
  * @description 用户登录请求DTO
  */
-@Data
-@AllArgsConstructor
+@Value
 public class LoginRequest {
-    private String username;
-    private String password;
-    private Boolean rememberMe;
+    String username;
+    String password;
+    Boolean rememberMe;
 }

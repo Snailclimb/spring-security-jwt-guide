@@ -2,7 +2,7 @@ package github.javaguide.springsecurityjwtguide.security.controller;
 
 import github.javaguide.springsecurityjwtguide.BaseTest;
 import github.javaguide.springsecurityjwtguide.security.dto.LoginRequest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

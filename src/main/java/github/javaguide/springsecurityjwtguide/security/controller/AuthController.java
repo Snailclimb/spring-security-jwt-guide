@@ -3,17 +3,21 @@ package github.javaguide.springsecurityjwtguide.security.controller;
 import github.javaguide.springsecurityjwtguide.security.common.constants.SecurityConstants;
 import github.javaguide.springsecurityjwtguide.security.dto.LoginRequest;
 import github.javaguide.springsecurityjwtguide.security.service.AuthService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author shuang.kou
@@ -21,14 +25,15 @@ import org.springframework.web.bind.annotation.RestController;
  **/
 @RestController
 @RequestMapping("/auth")
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
-@Api(tags = "认证")
 public class AuthController {
 
     private final AuthService authService;
 
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
+
     @PostMapping("/login")
-    @ApiOperation("登录")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest) {
         String token = authService.createToken(loginRequest);
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -37,9 +42,9 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    @ApiOperation("退出")
     public ResponseEntity<Void> logout() {
         authService.removeToken();
         return new ResponseEntity<>(HttpStatus.OK);
     }
+    
 }

@@ -31,18 +31,6 @@ public final class SecurityConstants {
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String TOKEN_TYPE = "JWT";
 
-    // Swagger WHITELIST
-    public static final String[] SWAGGER_WHITELIST = {
-            "/swagger-ui.html",
-            "/swagger-ui/*",
-            "/swagger-resources/**",
-            "/v2/api-docs",
-            "/v3/api-docs",
-            "/webjars/**",
-            //knife4j
-            "/doc.html",
-    };
-
     public static final String H2_CONSOLE = "/h2-console/**";
 
     // System WHITELIST

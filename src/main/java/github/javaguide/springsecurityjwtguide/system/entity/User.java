@@ -1,5 +1,6 @@
 package github.javaguide.springsecurityjwtguide.system.entity;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import github.javaguide.springsecurityjwtguide.system.web.representation.UserRepresentation;
 import lombok.AllArgsConstructor;
@@ -8,14 +9,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,11 +25,11 @@ import java.util.stream.Collectors;
  * @author shuang.kou
  */
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User extends AbstractAuditBase {
 
     @Id
@@ -40,7 +41,7 @@ public class User extends AbstractAuditBase {
     private String fullName;
     @Column(nullable = false)
     private String password;
-    @Column(columnDefinition = "tinyint(1) default 1")
+    @Column(columnDefinition = "boolean default true")
     private Boolean enabled;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

@@ -19,12 +19,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @SpringBootApplication
 public class SpringSecurityJwtGuideApplication implements CommandLineRunner {
 
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private UserRoleRepository userRoleRepository;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
+
+    public SpringSecurityJwtGuideApplication(RoleRepository roleRepository, UserRepository userRepository, UserRoleRepository userRoleRepository) {
+        this.roleRepository = roleRepository;
+        this.userRepository = userRepository;
+        this.userRoleRepository = userRoleRepository;
+    }
 
     public static void main(java.lang.String[] args) {
         SpringApplication.run(SpringSecurityJwtGuideApplication.class, args);
