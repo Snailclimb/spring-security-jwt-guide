@@ -30,12 +30,10 @@ Spring Security JWT Guide 是一个基于 Spring Boot 和 Spring Security 的认
 
 - [x] 将 SpringBoot 升级版 3.x，JDK 升级为 21。
 - [x] 增加 H2 内存数据库支持，无须 MySQL，一键启动项目启动后访问 [http://localhost:9333/api/h2-console](http://localhost:9333/api/h2-console) (用户名:root,密码:123456)
-- [x] 增加 Swagger，方便调用接口
 - [x] 异常处理部分代码重构，优化返回结构
 - [x] 新建一个 role 表，然后通过新建一个 role_user 表的形式，将用户与角色关联起来
 - [x] 文件结构重构
 - [x] 增加 jpa 审计功能
-- [x] login（登录）接口在 controller 层暴露出来
 - [x] 登出功能：redis 保存 token 信息（key->user id,value->token），登出后将 redis 中的 token 信息删除
 - [x] 重新登录将上一次登录生成的 token 弄失效（解决未过期的 token 还是可以用的问题）：重新登录会将 redis 中保存的 token 信息进行更新
 
